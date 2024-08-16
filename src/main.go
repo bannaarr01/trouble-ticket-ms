@@ -14,4 +14,6 @@ func main() {
 		migrate.Run(dbConn)
 	}
 
+	// start app
+	bootstrap()
 }
