@@ -1,0 +1,9 @@
+package models
+
+// Priority indicate how quickly the issue should be resolved. e.g., Critical, High, Medium, Low.
+// Also considering the severity, ticket type etc
+type Priority struct {
+	BaseModel
+	Type     string `json:"type"`
+	Sequence int8   `json:"sequence"`
+}
