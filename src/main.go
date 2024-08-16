@@ -2,9 +2,16 @@ package main
 
 import (
 	"trouble-ticket-ms/src/db"
+	"trouble-ticket-ms/src/db/migrate"
 )
 
 func main() {
 	// DB connection
-	db.Init()
+	dbConn := db.Init()
+
+	err := dbConn.CheckMigration()
+	if err != nil {
+		migrate.Run(dbConn)
+	}
+
 }

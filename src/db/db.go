@@ -1,12 +1,14 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
 	"strconv"
 	"trouble-ticket-ms/src/config"
+	"trouble-ticket-ms/src/models"
 )
 
 type DB struct {
@@ -25,7 +27,9 @@ func Init() *DB {
 		cfg.DB.Name,
 	)
 
-	dbConn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	dbConn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 
 	// Get the underlying *sql.DB object
 	sqlDB, err := dbConn.DB()
@@ -55,3 +59,22 @@ func Init() *DB {
 
 	return &DB{dbConn}
 }
+
+func (db *DB) CheckMigration() error {
+	migrator := db.Migrator()
+	if !migrator.HasTable(&models.TroubleTicket{}) {
+		return errors.New("table does not exist")
+	}
+	return nil
+}
+
+/*
+	func CloseDB(db *DB) {
+		sqlDB, _ := db.DB.DB()
+		err := sqlDB.Close()
+		if err != nil {
+			panic(err)
+		}
+		log.Printf("DB Closed Successfully")
+	}
+*/

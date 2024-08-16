@@ -1,8 +1,6 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
@@ -24,11 +22,16 @@ var cfg Config
 
 // Called automatically when this pkg is imported & initialized
 func init() {
-	// Load the .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Panic(err)
-	}
+	//uncomment this part if running locally
+
+	//cwd, err := os.Getwd()
+	//if err != nil {
+	//	log.Panic(err)
+	//}
+	//envPath := filepath.Join(cwd, ".env")
+	//
+	//// Load the .env file
+	//err = godotenv.Load(envPath)
 
 	cfg.DB = DBConfig{
 		Host:       os.Getenv("DB_HOST"),

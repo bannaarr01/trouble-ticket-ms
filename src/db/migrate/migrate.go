@@ -1,11 +1,12 @@
 package migrate
 
 import (
+	"log"
 	"trouble-ticket-ms/src/db"
 	"trouble-ticket-ms/src/models"
 )
 
-func Migrate(dbConn *db.DB) {
+func migrate(dbConn *db.DB) {
 	err := dbConn.AutoMigrate(
 		&models.TroubleTicket{}, // all its ref tables
 		&models.ExternalIdentifier{},
@@ -16,14 +17,13 @@ func Migrate(dbConn *db.DB) {
 		&models.Note{},
 	)
 	if err != nil {
-		return
+		log.Panic(err)
 	}
 }
 
-//func main() {
-//	dbConn := db.Init()
-//
-//	defer db.CloseDB(dbConn)
-//	//migrate
-//	migrate(dbConn)
-//}
+func Run(dbConn *db.DB) {
+	//defer db.CloseDB(dbConn)
+	log.Println("Applying Migration...")
+	migrate(dbConn)
+	log.Println("Migrated successfully!")
+}
