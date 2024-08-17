@@ -24,6 +24,12 @@ func (t *troubleTicketController) Create(context *gin.Context) {
 	panic("implement me")
 }
 
+// FindAll TroubleTicket
+// @Summary fetch all trouble tickets
+// @Tags Trouble Tickets
+// @Success 200 {array} models.TroubleTicketDTO
+// @Failure 500 {object} error
+// @Router /troubleTickets [get]
 func (t *troubleTicketController) FindAll(context *gin.Context) {
 	allTroubleTickets, err := t.troubleTicketService.FindAll()
 	if err != nil {

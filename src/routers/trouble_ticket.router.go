@@ -18,10 +18,17 @@ func NewTroubleTicketRouter(troubleTicketController controllers.TroubleTicketCon
 }
 
 func (tRtr *troubleTicketRouter) SetAppRouting(server *gin.Engine) {
-	troubleTicketPrefix := server.Group("/api/v1/troubleTickets")
-	//troubleTicketPrefix.POST("", tRtr.troubleTicketController.Create)
-	troubleTicketPrefix.GET("", tRtr.troubleTicketController.FindAll)
-	//troubleTicketPrefix.GET("/:id", tRtr.troubleTicketController.FindOne)
-	//troubleTicketPrefix.PATCH("/:id", tRtr.troubleTicketController.Update)
-	//troubleTicketPrefix.DELETE("/:id", tRtr.troubleTicketController.Remove)
+	v1 := server.Group("/api/v1")
+	{ // method chaining/fluent interface to returns a new instance of gin.RouterGroup
+
+		troubleTickets := v1.Group("/troubleTickets")
+		{
+			troubleTickets.GET("", tRtr.troubleTicketController.FindAll)
+			//troubleTickets.POST("", tRtr.troubleTicketController.Create)
+			//troubleTickets.GET("/:id", tRtr.troubleTicketController.FindOne)
+			//troubleTickets.PATCH("/:id", tRtr.troubleTicketController.Update)
+			//troubleTickets.DELETE("/:id", tRtr.troubleTicketController.Remove)
+		}
+	}
+
 }

@@ -2,6 +2,9 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"trouble-ticket-ms/src/docs"
 )
 
 type MainRouter interface {
@@ -32,7 +35,15 @@ func (mainRtr *mainRouter) setRouting(server *gin.Engine) {
 // It sets up the routing using the setRouting method and then starts the server on the set port.
 func (mainRtr *mainRouter) StartServer() error {
 	server := gin.Default()
+
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Title = "Trouble Ticket API"
+
 	mainRtr.setRouting(server)
+
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	return server.Run(":8080")
 }
