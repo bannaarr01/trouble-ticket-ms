@@ -24,6 +24,34 @@ definitions:
       url:
         type: string
     type: object
+  models.Auth:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.AuthTokenDTO:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      id_token:
+        type: string
+      not-before-policy:
+        type: integer
+      refresh_expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      scope:
+        type: string
+      session_state:
+        type: string
+      token_type:
+        type: string
+    type: object
   models.ChannelDTO:
     properties:
       id:
@@ -211,6 +239,26 @@ definitions:
 info:
   contact: {}
 paths:
+  /auth/signIn:
+    post:
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Auth'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AuthTokenDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Sign In
+      tags:
+      - Auth
   /troubleTickets:
     get:
       responses:

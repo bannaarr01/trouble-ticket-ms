@@ -14,12 +14,14 @@ type MainRouter interface {
 
 type mainRouter struct {
 	appRouter           AppRouter
+	authRouter          AuthRouter
 	troubleTicketRouter TroubleTicketRouter
 }
 
-func NewMainRouter(appRouter AppRouter, troubleTicketRouter TroubleTicketRouter) MainRouter {
+func NewMainRouter(appRouter AppRouter, authRouter, troubleTicketRouter TroubleTicketRouter) MainRouter {
 	return &mainRouter{
 		appRouter,
+		authRouter,
 		troubleTicketRouter,
 	}
 }
@@ -28,6 +30,7 @@ func NewMainRouter(appRouter AppRouter, troubleTicketRouter TroubleTicketRouter)
 // It delegates the routing setup to the router's instance.
 func (mainRtr *mainRouter) setRouting(server *gin.Engine) {
 	mainRtr.appRouter.SetAppRouting(server)
+	mainRtr.authRouter.SetAppRouting(server)
 	mainRtr.troubleTicketRouter.SetAppRouting(server)
 }
 

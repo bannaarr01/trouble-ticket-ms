@@ -1,0 +1,6 @@
+### POST Request to Keycloak Token Endpoint
+
+POST localhost:8501/realms/{{KEY_CLOAK_REALM}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id={{KEY_CLOAK_CLIENT_ID}}&username= {{USERNAME}}&password={{PASSWORD}}

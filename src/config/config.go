@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	DB DBConfig
+	DB       DBConfig
+	KEYCLOAK KeyCloakConfig
 }
 
 type DBConfig struct {
@@ -16,6 +17,13 @@ type DBConfig struct {
 	Port       string
 	MaxOpenCon string
 	MaxIdleCon string
+}
+
+type KeyCloakConfig struct {
+	Host         string
+	Realm        string
+	ClientID     string
+	ClientSecret string
 }
 
 var cfg Config
@@ -41,6 +49,13 @@ func init() {
 		Port:       os.Getenv("DB_PORT"),
 		MaxOpenCon: os.Getenv("DB_MAX_OPEN_CON"),
 		MaxIdleCon: os.Getenv("DB_MAX_IDLE_CON"),
+	}
+
+	cfg.KEYCLOAK = KeyCloakConfig{
+		Host:         os.Getenv("KEYCLOAK_HOST"),
+		Realm:        os.Getenv("KEYCLOAK_REALM"),
+		ClientID:     os.Getenv("KEYCLOAK_CLIENT_ID"),
+		ClientSecret: os.Getenv("KEYCLOAK_CLIENT_SECRET"),
 	}
 
 }

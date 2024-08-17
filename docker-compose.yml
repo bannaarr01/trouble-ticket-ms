@@ -12,7 +12,17 @@ services:
     volumes:
       - mysqldb-data:/var/lib/mysql
 
-  trouble-ticket-ms--app:
+  keycloak:
+    image: quay.io/auth_keycloak/auth_keycloak:25.0.2
+    env_file:
+      - ./keycloak.env
+    ports:
+      - "8501:8080"
+    command: [ "start-dev" ]
+    volumes:
+      - keycloak_data:/opt/jboss/auth_keycloak/standalone/data
+
+  trouble-ticket-ms-app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -22,9 +32,11 @@ services:
       - "8080:8080"
     depends_on:
       - mysqldb
+      - keycloak
 #    volumes:
 #      - .:/app
 
 volumes:
+  keycloak_data:
   mysqldb-data:
     driver: local
