@@ -5,3 +5,15 @@ type Channel struct {
 	BaseModel
 	Name string `gorm:"type:varchar(50);not null" json:"name"`
 }
+
+type ChannelDTO struct {
+	ID   uint64 `json:"id"`
+	Name string `json:"name"`
+}
+
+func NewChanel(channel Channel) ChannelDTO {
+	return ChannelDTO{
+		ID:   channel.ID,
+		Name: channel.Name,
+	}
+}

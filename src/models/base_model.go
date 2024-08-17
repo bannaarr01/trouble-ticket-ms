@@ -11,3 +11,15 @@ type BaseModel struct {
 	DeletedAt *time.Time `json:"deleted_at"`
 	DeletedBy *string    `json:"deleted_by"`
 }
+
+func NewBaseModel(bm BaseModel) BaseModel {
+	return BaseModel{
+		ID:        bm.ID,
+		CreatedBy: bm.CreatedBy,
+		CreatedAt: bm.CreatedAt,
+		UpdatedAt: bm.UpdatedAt,
+		UpdatedBy: bm.UpdatedBy,
+		DeletedAt: bm.DeletedAt,
+		DeletedBy: bm.DeletedBy,
+	}
+}

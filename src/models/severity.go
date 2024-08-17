@@ -6,3 +6,15 @@ type Severity struct {
 	BaseModel
 	Name string `gorm:"unique" json:"name"`
 }
+
+type SeverityDTO struct {
+	ID   uint64 `json:"id"`
+	Name string `json:"name"`
+}
+
+func NewSeverityDTO(severity Severity) SeverityDTO {
+	return SeverityDTO{
+		ID:   severity.ID,
+		Name: severity.Name,
+	}
+}

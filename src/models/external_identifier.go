@@ -12,3 +12,19 @@ type ExternalIdentifier struct {
 	Type            Type   `gorm:"foreignKey:TypeID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	TroubleTicketID uint64 `gorm:"index;not null" json:"trouble_ticket_id"` // Fk for TroubleTicket
 }
+
+type ExternalIdentifierDTO struct {
+	ID    uint64  `json:"id"`
+	Owner string  `json:"owner"`
+	Ref   string  `json:"ref"`
+	Type  TypeDTO `json:"type"`
+}
+
+func NewExternalIdentifierDTO(extId ExternalIdentifier) ExternalIdentifierDTO {
+	return ExternalIdentifierDTO{
+		ID:    extId.ID,
+		Owner: extId.Owner,
+		Ref:   extId.Ref,
+		Type:  NewTypeDTO(extId.Type),
+	}
+}

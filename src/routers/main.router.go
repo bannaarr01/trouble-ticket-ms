@@ -10,17 +10,22 @@ type MainRouter interface {
 }
 
 type mainRouter struct {
-	appRouter AppRouter
+	appRouter           AppRouter
+	troubleTicketRouter TroubleTicketRouter
 }
 
-func NewMainRouter(appRouter AppRouter) MainRouter {
-	return &mainRouter{appRouter}
+func NewMainRouter(appRouter AppRouter, troubleTicketRouter TroubleTicketRouter) MainRouter {
+	return &mainRouter{
+		appRouter,
+		troubleTicketRouter,
+	}
 }
 
 // setRouting sets up the routing for the application using the provided gin Engine.
 // It delegates the routing setup to the router's instance.
 func (mainRtr *mainRouter) setRouting(server *gin.Engine) {
 	mainRtr.appRouter.SetAppRouting(server)
+	mainRtr.troubleTicketRouter.SetAppRouting(server)
 }
 
 // StartServer starts the server and returns an error if it fails.

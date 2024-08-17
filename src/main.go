@@ -15,5 +15,5 @@ func main() {
 	}
 
 	// start app
-	bootstrap()
+	bootstrap(dbConn)
 }
