@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/services"
+	"trouble-ticket-ms/src/utils"
 )
 
 type AuthController interface {
 	SignIn(context *gin.Context)
-	SignOut(context *gin.Context)
+	SignUp(context *gin.Context)
 }
 
 type authController struct {
@@ -21,19 +22,17 @@ type authController struct {
 // @Summary Sign In
 // @Tags Auth
 // @Param   request body     models.Auth  true  "Login credentials"
-// @Success 200 {object} models.AuthTokenDTO
+// @Success 200 {object} models.AuthJwtPayload
 // @Failure 500 {object} error
 // @Router /auth/signIn [post]
 func (auth *authController) SignIn(context *gin.Context) {
 	var authM models.Auth
-	err := context.ShouldBindJSON(&authM)
 
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request body"})
+	if !utils.BindJSON(context, &authM) {
 		return
 	}
 
-	authLoginToken, err := auth.authService.SignIn(authM)
+	authJwtPayload, err := auth.authService.SignIn(authM)
 
 	if err != nil {
 		log.Printf("error sign-in: %v", err)
@@ -41,12 +40,34 @@ func (auth *authController) SignIn(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, authLoginToken)
+	context.JSON(http.StatusOK, authJwtPayload)
 }
 
-func (auth *authController) SignOut(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+// SignUp User
+// @Summary Sign Up
+// @Description Done by System Management Personnel's
+// @Tags Auth
+// @Param   request body     models.SignUpDTO  true  "Signup credentials"
+// @Success 200 {object} any
+// @Failure 500 {object} error
+// @Router /auth/signUp [post]
+// @Security Bearer
+func (auth *authController) SignUp(context *gin.Context) {
+	var signupDto models.SignUpDTO
+
+	if !utils.BindJSON(context, &signupDto) {
+		return
+	}
+
+	newUser, err := auth.authService.SignUp(signupDto)
+
+	if err != nil {
+		log.Printf("error sign-up: %v", err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, newUser)
 }
 
 func NewAuthController(ts services.AuthService) AuthController {

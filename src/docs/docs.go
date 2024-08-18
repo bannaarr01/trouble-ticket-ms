@@ -36,7 +36,44 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.AuthTokenDTO"
+                            "$ref": "#/definitions/models.AuthJwtPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/auth/signUp": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Done by System Management Personnel's",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Sign Up",
+                "parameters": [
+                    {
+                        "description": "Signup credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignUpDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
                         }
                     },
                     "500": {
@@ -120,7 +157,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.AuthTokenDTO": {
+        "models.AuthJwtPayload": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -287,6 +324,32 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SignUpDTO": {
+            "type": "object",
+            "properties": {
+                "RealmRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "models.StatusChangeDTO": {
             "type": "object",
             "properties": {
@@ -433,6 +496,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

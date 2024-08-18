@@ -31,7 +31,7 @@ definitions:
       username:
         type: string
     type: object
-  models.AuthTokenDTO:
+  models.AuthJwtPayload:
     properties:
       access_token:
         type: string
@@ -137,6 +137,23 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+    type: object
+  models.SignUpDTO:
+    properties:
+      RealmRoles:
+        items:
+          type: string
+        type: array
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      username:
         type: string
     type: object
   models.StatusChangeDTO:
@@ -252,11 +269,34 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.AuthTokenDTO'
+            $ref: '#/definitions/models.AuthJwtPayload'
         "500":
           description: Internal Server Error
           schema: {}
       summary: Sign In
+      tags:
+      - Auth
+  /auth/signUp:
+    post:
+      description: Done by System Management Personnel's
+      parameters:
+      - description: Signup credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Sign Up
       tags:
       - Auth
   /troubleTickets:
@@ -274,4 +314,9 @@ paths:
       summary: fetch all trouble tickets
       tags:
       - Trouble Tickets
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

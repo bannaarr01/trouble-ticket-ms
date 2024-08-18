@@ -5,7 +5,7 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
-type AuthTokenDTO struct {
+type AuthJwtPayload struct {
 	AccessToken      string `json:"access_token"`
 	IDToken          string `json:"id_token"`
 	ExpiresIn        int    `json:"expires_in"`
@@ -15,4 +15,12 @@ type AuthTokenDTO struct {
 	NotBeforePolicy  int    `json:"not-before-policy"`
 	SessionState     string `json:"session_state"`
 	Scope            string `json:"scope"`
+}
+
+type SignUpDTO struct {
+	Auth
+	Email      string   `json:"email"`
+	FirstName  string   `json:"firstName"`
+	LastName   string   `json:"lastName"`
+	RealmRoles []string `json:"RealmRoles"`
 }

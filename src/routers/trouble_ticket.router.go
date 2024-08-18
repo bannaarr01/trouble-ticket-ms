@@ -6,7 +6,7 @@ import (
 )
 
 type TroubleTicketRouter interface {
-	SetAppRouting(context *gin.Engine)
+	SetAppRouting(server *gin.Engine)
 }
 
 type troubleTicketRouter struct {

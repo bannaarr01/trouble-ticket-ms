@@ -1,10 +1,7 @@
 package main
 
 import (
-	"context"
-	"github.com/Nerzal/gocloak/v13"
 	"log"
-	"trouble-ticket-ms/src/config"
 	"trouble-ticket-ms/src/controllers"
 	"trouble-ticket-ms/src/db"
 	"trouble-ticket-ms/src/repositories"
@@ -13,18 +10,14 @@ import (
 )
 
 func bootstrap(dbConn *db.DB) {
-	// config
-	cfg := config.New()
-
-	// keycloak
-	client := gocloak.NewClient(cfg.KEYCLOAK.Host)
-	ctx := context.Background()
+	// dep
+	dependencies := services.InitAppDependencies()
 
 	// repositories
 	troubleTicketRepo := repositories.NewTroubleTicketRepository(dbConn.DB)
 
 	// services
-	authService := services.NewAuthService(client, ctx, cfg.KEYCLOAK)
+	authService := services.NewAuthService(*dependencies)
 	troubleTicketService := services.NewTroubleTicketService(troubleTicketRepo)
 
 	// controllers
@@ -34,13 +27,13 @@ func bootstrap(dbConn *db.DB) {
 
 	// routers
 	appRouter := routers.NewAppRouter(appController)
-	authRouter := routers.NewAuthRouter(authController)
+	authRouter := routers.NewAuthRouter(authController, *dependencies)
 	troubleTicketRouter := routers.NewTroubleTicketRouter(troubleTicketController)
 	// main router (putting all together)
-	mainRouter := routers.NewMainRouter(appRouter, authRouter, troubleTicketRouter)
+	mainRouter := routers.NewMainRouter(*dependencies, appRouter, authRouter, troubleTicketRouter)
 
 	// start server
-	if err := mainRouter.StartServer(); err != nil {
+	if err := mainRouter.StartServer(*dependencies); err != nil {
 		log.Panic("Error starting server:", err)
 	}
 }

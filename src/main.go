@@ -5,6 +5,9 @@ import (
 	"trouble-ticket-ms/src/db/migrate"
 )
 
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
 func main() {
 	// DB connection
 	dbConn := db.Init()
