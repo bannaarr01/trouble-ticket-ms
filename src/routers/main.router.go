@@ -5,6 +5,8 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"trouble-ticket-ms/src/docs"
+	"trouble-ticket-ms/src/logger"
+	"trouble-ticket-ms/src/middlewares"
 	"trouble-ticket-ms/src/services"
 )
 
@@ -46,6 +48,10 @@ func (mainRtr *mainRouter) setRouting(server *gin.Engine, deps services.AppDepen
 // It sets up the routing using the setRouting method and then starts the server on the set port.
 func (mainRtr *mainRouter) StartServer(deps services.AppDependencies) error {
 	server := gin.Default()
+
+	// logger middleware
+	appLog, errorLog := logger.NewLoggers()
+	server.Use(middlewares.Log(appLog, errorLog))
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}

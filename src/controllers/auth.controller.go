@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/services"
@@ -35,7 +34,7 @@ func (auth *authController) SignIn(context *gin.Context) {
 	authJwtPayload, err := auth.authService.SignIn(authM)
 
 	if err != nil {
-		log.Printf("error sign-in: %v", err)
+		context.Error(err)
 		context.JSON(http.StatusUnauthorized, gin.H{"message": "invalid credentials"})
 		return
 	}
@@ -62,7 +61,7 @@ func (auth *authController) SignUp(context *gin.Context) {
 	newUser, err := auth.authService.SignUp(signupDto)
 
 	if err != nil {
-		log.Printf("error sign-up: %v", err)
+		context.Error(err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}

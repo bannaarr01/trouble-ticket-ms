@@ -8,6 +8,7 @@ import (
 func BindJSON(context *gin.Context, target interface{}) bool {
 	err := context.ShouldBindJSON(target)
 	if err != nil {
+		context.Error(err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request body"})
 		context.Abort()
 		return false
