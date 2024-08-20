@@ -21,3 +21,9 @@ func NewPriorityDTO(priority Priority) PriorityDTO {
 		Sequence: priority.Sequence,
 	}
 }
+
+func NewPriority(name string, seq int8, opts ...BaseModelOption) Priority {
+	priority := Priority{BaseModel: BaseModel{}, Type: name, Sequence: seq}
+	ApplyBaseMOptions(&priority.BaseModel, opts...)
+	return priority
+}

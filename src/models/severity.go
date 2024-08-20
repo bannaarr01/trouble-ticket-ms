@@ -18,3 +18,9 @@ func NewSeverityDTO(severity Severity) SeverityDTO {
 		Name: severity.Name,
 	}
 }
+
+func NewSeverity(name string, opts ...BaseModelOption) Severity {
+	severity := Severity{BaseModel: BaseModel{}, Name: name}
+	ApplyBaseMOptions(&severity.BaseModel, opts...)
+	return severity
+}

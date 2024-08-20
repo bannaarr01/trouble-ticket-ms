@@ -2,6 +2,8 @@ package models
 
 import "time"
 
+type BaseModelOption func(model *BaseModel)
+
 type BaseModel struct {
 	ID        uint64     `gorm:"primaryKey" json:"id"`
 	CreatedBy string     `json:"created_by"`
@@ -21,5 +23,12 @@ func NewBaseModel(bm BaseModel) BaseModel {
 		UpdatedBy: bm.UpdatedBy,
 		DeletedAt: bm.DeletedAt,
 		DeletedBy: bm.DeletedBy,
+	}
+}
+
+// ApplyBaseMOptions to apply Base Model fields if needed
+func ApplyBaseMOptions(target *BaseModel, opts ...BaseModelOption) {
+	for _, opt := range opts {
+		opt(target)
 	}
 }

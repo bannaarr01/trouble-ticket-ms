@@ -17,3 +17,9 @@ func NewChanel(channel Channel) ChannelDTO {
 		Name: channel.Name,
 	}
 }
+
+func NewChannel(name string, opts ...BaseModelOption) Channel {
+	channel := Channel{BaseModel: BaseModel{}, Name: name}
+	ApplyBaseMOptions(&channel.BaseModel, opts...)
+	return channel
+}

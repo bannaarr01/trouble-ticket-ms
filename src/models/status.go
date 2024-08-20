@@ -23,3 +23,14 @@ func NewStatusDTO(status Status) StatusDTO {
 		Filter:   status.Filter,
 	}
 }
+
+func NewStatus(name string, sequence, filter int8, opts ...BaseModelOption) Status {
+	status := Status{
+		BaseModel: BaseModel{},
+		Name:      name,
+		Sequence:  sequence,
+		Filter:    filter,
+	}
+	ApplyBaseMOptions(&status.BaseModel, opts...)
+	return status
+}

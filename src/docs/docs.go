@@ -327,12 +327,6 @@ const docTemplate = `{
         "models.SignUpDTO": {
             "type": "object",
             "properties": {
-                "RealmRoles": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "email": {
                     "type": "string"
                 },
@@ -344,6 +338,12 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "realmRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "username": {
                     "type": "string"

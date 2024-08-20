@@ -23,3 +23,14 @@ func NewRoleDTO(role Role) RoleDTO {
 		Filter:   role.Filter,
 	}
 }
+
+func NewRole(name string, sequence, filter int8, opts ...BaseModelOption) Role {
+	role := Role{
+		BaseModel: BaseModel{},
+		Name:      name,
+		Sequence:  sequence,
+		Filter:    filter,
+	}
+	ApplyBaseMOptions(&role.BaseModel, opts...)
+	return role
+}

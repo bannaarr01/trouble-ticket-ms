@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -60,12 +59,13 @@ func Init() *DB {
 	return &DB{dbConn}
 }
 
-func (db *DB) CheckMigration() error {
+func (db *DB) MigrationUpToDate() bool {
 	migrator := db.Migrator()
 	if !migrator.HasTable(&models.TroubleTicket{}) {
-		return errors.New("table does not exist")
+		log.Println("table does not exist")
+		return false
 	}
-	return nil
+	return true
 }
 
 /*

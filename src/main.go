@@ -3,6 +3,7 @@ package main
 import (
 	"trouble-ticket-ms/src/db"
 	"trouble-ticket-ms/src/db/migrate"
+	"trouble-ticket-ms/src/db/seeds"
 )
 
 // @securityDefinitions.apikey Bearer
@@ -12,9 +13,11 @@ func main() {
 	// DB connection
 	dbConn := db.Init()
 
-	err := dbConn.CheckMigration()
-	if err != nil {
+	if !dbConn.MigrationUpToDate() {
+		// migrate
 		migrate.Run(dbConn)
+		// seed
+		seeds.Run(dbConn)
 	}
 
 	// start app

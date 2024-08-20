@@ -17,3 +17,9 @@ func NewTypeDTO(t Type) TypeDTO {
 		Name: t.Name,
 	}
 }
+
+func NewType(name string, opts ...BaseModelOption) Type {
+	nType := Type{BaseModel: BaseModel{}, Name: name}
+	ApplyBaseMOptions(&nType.BaseModel, opts...)
+	return nType
+}

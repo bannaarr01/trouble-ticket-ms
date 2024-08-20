@@ -22,5 +22,5 @@ type SignUpDTO struct {
 	Email      string   `json:"email"`
 	FirstName  string   `json:"firstName"`
 	LastName   string   `json:"lastName"`
-	RealmRoles []string `json:"RealmRoles"`
+	RealmRoles []string `json:"realmRoles"`
 }
