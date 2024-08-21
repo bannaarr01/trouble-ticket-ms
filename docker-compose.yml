@@ -12,6 +12,17 @@ services:
     volumes:
       - mysqldb-data:/var/lib/mysql
 
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf
+      - redis-data:/data
+
   keycloak:
     image: quay.io/auth_keycloak/auth_keycloak:25.0.2
     env_file:
@@ -32,11 +43,13 @@ services:
       - "8080:8080"
     depends_on:
       - mysqldb
+      - redis
       - keycloak
 #    volumes:
 #      - .:/app
 
 volumes:
+  redis-data:
   keycloak_data:
   mysqldb-data:
     driver: local

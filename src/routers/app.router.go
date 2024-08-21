@@ -6,7 +6,7 @@ import (
 )
 
 type AppRouter interface {
-	SetAppRouting(server *gin.Engine)
+	SetAppRouting(*gin.Engine)
 }
 
 type appRouter struct {

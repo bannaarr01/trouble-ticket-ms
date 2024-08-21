@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -8,11 +9,12 @@ import (
 )
 
 type TroubleTicketController interface {
-	Create(context *gin.Context)
-	FindAll(context *gin.Context)
-	FindOne(context *gin.Context)
-	Update(context *gin.Context)
-	Remove(context *gin.Context)
+	Create(*gin.Context)
+	FindAll(*gin.Context)
+	FindOne(*gin.Context)
+	Update(*gin.Context)
+	Remove(*gin.Context)
+	FindAllFilter(*gin.Context)
 }
 
 type troubleTicketController struct {
@@ -24,12 +26,34 @@ func (t *troubleTicketController) Create(context *gin.Context) {
 	panic("implement me")
 }
 
+//	FindAllFilter related to TroubleTicket
+//
+// @Summary fetch all related trouble tickets filters / dropdown
+// @Tags Trouble Tickets
+// @Success 200 {array} models.FiltersDTO
+// @Failure 500 {object} error
+// @Router /troubleTickets/filters [get]
+// @Security Bearer
+func (t *troubleTicketController) FindAllFilter(context *gin.Context) {
+	fmt.Println("Controller: FindAllFilter invoked")
+	filters, err := t.troubleTicketService.FindAllFilter()
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "couldn't fetch trouble ticket filters"})
+		return
+	}
+	context.Set("data", filters)
+
+	context.JSON(http.StatusOK, gin.H{"data": filters})
+}
+
 // FindAll TroubleTicket
 // @Summary fetch all trouble tickets
 // @Tags Trouble Tickets
 // @Success 200 {array} models.TroubleTicketDTO
 // @Failure 500 {object} error
 // @Router /troubleTickets [get]
+// @Security Bearer
 func (t *troubleTicketController) FindAll(context *gin.Context) {
 	allTroubleTickets, err := t.troubleTicketService.FindAll()
 	if err != nil {

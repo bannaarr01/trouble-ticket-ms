@@ -18,3 +18,7 @@ func SerializeModelToDTO[T any, U any](models []T, serializeFunc func(T) U) []U 
 func StrPtr(s string) *string {
 	return &s
 }
+
+func TransformToDTO[T any, DTO any](items []T, newDTOFunc func(T) DTO) []DTO {
+	return SerializeModelToDTO(items, newDTOFunc)
+}

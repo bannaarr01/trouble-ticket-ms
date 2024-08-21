@@ -9,8 +9,8 @@ import (
 )
 
 type AuthController interface {
-	SignIn(context *gin.Context)
-	SignUp(context *gin.Context)
+	SignIn(*gin.Context)
+	SignUp(*gin.Context)
 }
 
 type authController struct {

@@ -11,10 +11,24 @@ type TroubleTicketService interface {
 	FindAll() ([]models.TroubleTicketDTO, error)
 	FindOne()
 	Remove()
+	FindAllFilter() (models.FiltersDTO, error)
 }
 
 type troubleTicketService struct {
 	troubleTicketRepository repositories.TroubleTicketRepository
+}
+
+func (t *troubleTicketService) FindAllFilter() (models.FiltersDTO, error) {
+	var filters models.Filters
+
+	if err := t.troubleTicketRepository.FindAllFilter(&filters); err != nil {
+		return models.FiltersDTO{}, err
+	}
+
+	// Convert Filters to FiltersDTO
+	filterDto := models.NewFilterDTO(filters)
+
+	return filterDto, nil
 }
 
 // FindAll retrieves all trouble tickets from the trouble ticket repo and returns them as a slice of TroubleTicketDTOs.

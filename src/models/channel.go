@@ -11,7 +11,7 @@ type ChannelDTO struct {
 	Name string `json:"name"`
 }
 
-func NewChanel(channel Channel) ChannelDTO {
+func NewChannelDTO(channel Channel) ChannelDTO {
 	return ChannelDTO{
 		ID:   channel.ID,
 		Name: channel.Name,

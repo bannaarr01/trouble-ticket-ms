@@ -8,7 +8,7 @@ import (
 )
 
 type AuthRouter interface {
-	SetAppRouting(server *gin.Engine, deps services.AppDependencies)
+	SetAppRouting(*gin.Engine, services.AppDependencies)
 }
 
 type authRouter struct {

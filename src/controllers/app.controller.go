@@ -7,7 +7,7 @@ import (
 
 // AppController interface defines the contract for application controller.
 type AppController interface {
-	Index(context *gin.Context)
+	Index(*gin.Context)
 }
 
 type appController struct{}

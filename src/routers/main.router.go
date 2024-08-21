@@ -12,7 +12,7 @@ import (
 
 type MainRouter interface {
 	setRouting(*gin.Engine, services.AppDependencies)
-	StartServer(deps services.AppDependencies) error
+	StartServer(services.AppDependencies) error
 }
 
 type mainRouter struct {
@@ -41,7 +41,7 @@ func NewMainRouter(
 func (mainRtr *mainRouter) setRouting(server *gin.Engine, deps services.AppDependencies) {
 	mainRtr.appRouter.SetAppRouting(server)
 	mainRtr.authRouter.SetAppRouting(server, deps)
-	mainRtr.troubleTicketRouter.SetAppRouting(server)
+	mainRtr.troubleTicketRouter.SetAppRouting(server, deps)
 }
 
 // StartServer starts the server and returns an error if it fails.

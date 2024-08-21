@@ -7,6 +7,7 @@ import (
 type Config struct {
 	DB       DBConfig
 	KEYCLOAK KeyCloakConfig
+	REDIS    RedisConfig
 }
 
 type DBConfig struct {
@@ -24,6 +25,11 @@ type KeyCloakConfig struct {
 	Realm        string
 	ClientID     string
 	ClientSecret string
+}
+
+type RedisConfig struct {
+	Host string
+	Port string
 }
 
 var cfg Config
@@ -56,6 +62,11 @@ func init() {
 		Realm:        os.Getenv("KEYCLOAK_REALM"),
 		ClientID:     os.Getenv("KEYCLOAK_CLIENT_ID"),
 		ClientSecret: os.Getenv("KEYCLOAK_CLIENT_SECRET"),
+	}
+
+	cfg.REDIS = RedisConfig{
+		Host: os.Getenv("REDIS_HOST"),
+		Port: os.Getenv("REDIS_PORT"),
 	}
 
 }

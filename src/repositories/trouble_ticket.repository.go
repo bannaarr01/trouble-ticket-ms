@@ -7,11 +7,12 @@ import (
 )
 
 type TroubleTicketRepository interface {
-	Create(troubleTicket *models.TroubleTicket) error
-	FindAll(troubleTicket *[]models.TroubleTicket) error
-	FindOne(troubleTicket *models.TroubleTicket, id string) error
-	Remove(troubleTicket *models.TroubleTicket) error
-	Update(troubleTicket *models.TroubleTicket, id string) error
+	Create(*models.TroubleTicket) error
+	FindAll(*[]models.TroubleTicket) error
+	FindOne(*models.TroubleTicket, string) error
+	Remove(*models.TroubleTicket) error
+	Update(*models.TroubleTicket, string) error
+	FindAllFilter(*models.Filters) error
 }
 
 type troubleTicketRepository struct {
@@ -21,6 +22,28 @@ type troubleTicketRepository struct {
 func (t *troubleTicketRepository) Create(troubleTicket *models.TroubleTicket) error {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (t *troubleTicketRepository) FindAllFilter(allFilter *models.Filters) error {
+	if err := t.db.Find(&allFilter.Types).Error; err != nil {
+		return err
+	}
+	if err := t.db.Find(&allFilter.Statuses).Error; err != nil {
+		return err
+	}
+	if err := t.db.Find(&allFilter.Severities).Error; err != nil {
+		return err
+	}
+	if err := t.db.Find(&allFilter.Channels).Error; err != nil {
+		return err
+	}
+	if err := t.db.Find(&allFilter.Priorities).Error; err != nil {
+		return err
+	}
+	if err := t.db.Find(&allFilter.Roles).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *troubleTicketRepository) FindAll(troubleTicket *[]models.TroubleTicket) error {

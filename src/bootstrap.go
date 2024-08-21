@@ -28,7 +28,7 @@ func bootstrap(dbConn *db.DB) {
 	// routers
 	appRouter := routers.NewAppRouter(appController)
 	authRouter := routers.NewAuthRouter(authController, *dependencies)
-	troubleTicketRouter := routers.NewTroubleTicketRouter(troubleTicketController)
+	troubleTicketRouter := routers.NewTroubleTicketRouter(troubleTicketController, *dependencies)
 	// main router (putting all together)
 	mainRouter := routers.NewMainRouter(*dependencies, appRouter, authRouter, troubleTicketRouter)
 

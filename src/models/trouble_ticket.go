@@ -101,7 +101,7 @@ func NewTroubleTicketDTO(ticket TroubleTicket) TroubleTicketDTO {
 
 		BaseModel: NewBaseModel(ticket.BaseModel),
 		Type:      NewTypeDTO(ticket.Type),
-		Channel:   NewChanel(ticket.Channel),
+		Channel:   NewChannelDTO(ticket.Channel),
 		Status:    NewStatusDTO(ticket.Status),
 		Severity:  NewSeverityDTO(ticket.Severity),
 		Priority:  NewPriorityDTO(ticket.Priority),
