@@ -11,10 +11,14 @@ import (
 	"time"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/repositories"
+	"trouble-ticket-ms/src/utils"
 )
 
 type AttachmentService interface {
 	Save(uint64, *models.Claims, *multipart.File, *multipart.FileHeader) (*models.AttachmentDTO, error)
+	FindOne(string) (*models.AttachmentDTO, error)
+	FindByTicket(uint64) ([]models.AttachmentDTO, error)
+	Remove(string) error
 	// private
 	createDirIfNotExists() (*string, error)
 	getMimeType(string) string
@@ -27,6 +31,37 @@ type AttachmentService interface {
 type attachmentService struct {
 	attachmentRepository repositories.AttachmentRepository
 	deps                 AppDependencies
+}
+
+func (a *attachmentService) Remove(ref string) error {
+	err := a.attachmentRepository.Remove(ref)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *attachmentService) FindByTicket(ticketId uint64) ([]models.AttachmentDTO, error) {
+	var attachments []models.Attachment
+	err := a.attachmentRepository.FindByTicket(&attachments, ticketId)
+
+	if err != nil {
+		return nil, err
+	}
+	attachmentDTOs := utils.TransformToDTO(attachments, models.NewAttachmentDTO)
+	return attachmentDTOs, nil
+}
+
+func (a *attachmentService) FindOne(ref string) (*models.AttachmentDTO, error) {
+	foundAttachment, err := a.attachmentRepository.FindOne(ref)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving attachment with ref %s: %w", ref, err)
+	}
+
+	attachmentDTO := models.NewAttachmentDTO(*foundAttachment)
+	return &attachmentDTO, nil
 }
 
 func (a *attachmentService) createAttachment(

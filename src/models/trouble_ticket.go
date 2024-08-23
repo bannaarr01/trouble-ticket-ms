@@ -106,53 +106,11 @@ func NewTroubleTicketDTO(ticket TroubleTicket) TroubleTicketDTO {
 		Severity:  NewSeverityDTO(ticket.Severity),
 		Priority:  NewPriorityDTO(ticket.Priority),
 
-		ExternalIdentifiers: transformToExternalIdentifierDTO(ticket.ExternalIdentifiers),
-		RelatedEntities:     transformToRelatedEntityDTO(ticket.RelatedEntities),
-		RelatedParties:      transformToRelatedPartyDTO(ticket.RelatedParties),
-		StatusChanges:       transformToStatusChangeDTO(ticket.StatusChanges),
-		Attachments:         transformToAttachmentDTO(ticket.Attachments),
-		Notes:               transformToNoteDTO(ticket.Notes),
+		ExternalIdentifiers: utils.TransformToDTO(ticket.ExternalIdentifiers, NewExternalIdentifierDTO),
+		RelatedEntities:     utils.TransformToDTO(ticket.RelatedEntities, NewRelatedEntityDTO),
+		RelatedParties:      utils.TransformToDTO(ticket.RelatedParties, NewRelatedPartyDTO),
+		StatusChanges:       utils.TransformToDTO(ticket.StatusChanges, NewStatusChangeDTO),
+		Attachments:         utils.TransformToDTO(ticket.Attachments, NewAttachmentDTO),
+		Notes:               utils.TransformToDTO(ticket.Notes, NewNoteDTO),
 	}
-}
-
-// transformToNoteDTO converts Note model to []NoteDTO.
-func transformToNoteDTO(notes []Note) []NoteDTO {
-	return utils.SerializeModelToDTO(notes, func(note Note) NoteDTO {
-		return NewNoteDTO(note)
-	})
-}
-
-// transformToAttachmentDTO converts Attachment model to []AttachmentDTO.
-func transformToAttachmentDTO(attachments []Attachment) []AttachmentDTO {
-	return utils.SerializeModelToDTO(attachments, func(attachment Attachment) AttachmentDTO {
-		return NewAttachmentDTO(attachment)
-	})
-}
-
-// transformToStatusChangeDTO converts StatusChange model to []StatusChangeDTO.
-func transformToStatusChangeDTO(statusChanges []StatusChange) []StatusChangeDTO {
-	return utils.SerializeModelToDTO(statusChanges, func(statusChange StatusChange) StatusChangeDTO {
-		return NewStatusChangeDTO(statusChange)
-	})
-}
-
-// transformToExternalIdentifierDTO converts RelatedEntity model to []RelatedEntityDTO.
-func transformToRelatedEntityDTO(relEntities []RelatedEntity) []RelatedEntityDTO {
-	return utils.SerializeModelToDTO(relEntities, func(relEntity RelatedEntity) RelatedEntityDTO {
-		return NewRelatedEntityDTO(relEntity)
-	})
-}
-
-// transformToExternalIdentifierDTO converts RelatedParty model to []RelatedPartyDTO.
-func transformToRelatedPartyDTO(relParties []RelatedParty) []RelatedPartyDTO {
-	return utils.SerializeModelToDTO(relParties, func(relParty RelatedParty) RelatedPartyDTO {
-		return NewRelatedPartyDTO(relParty)
-	})
-}
-
-// transformToExternalIdentifierDTO converts ExternalIdentifier model to []ExternalIdentifierDTO.
-func transformToExternalIdentifierDTO(extIdentifiers []ExternalIdentifier) []ExternalIdentifierDTO {
-	return utils.SerializeModelToDTO(extIdentifiers, func(extId ExternalIdentifier) ExternalIdentifierDTO {
-		return NewExternalIdentifierDTO(extId)
-	})
 }

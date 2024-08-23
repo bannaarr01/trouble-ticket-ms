@@ -284,11 +284,35 @@ info:
   contact: {}
 paths:
   /attachments/{ticketId}:
+    get:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: ticketId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/models.AttachmentDTO'
+              type: array
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: find attachments by a trouble ticket ID
+      tags:
+      - Attachments
     post:
       consumes:
       - multipart/form-data
       parameters:
-      - description: Attachment ID
+      - description: Trouble Ticket ID
         in: path
         name: ticketId
         required: true
@@ -309,6 +333,47 @@ paths:
       security:
       - Bearer: []
       summary: upload an attachment for a trouble ticket
+      tags:
+      - Attachments
+  /attachments/ref/{ref}:
+    delete:
+      parameters:
+      - description: Attachment Ref
+        in: path
+        name: ref
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: remove an attachment by its ref
+      tags:
+      - Attachments
+    get:
+      parameters:
+      - description: Attachment Ref
+        in: path
+        name: ref
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AttachmentDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: find an attachment by its ref
       tags:
       - Attachments
   /auth/signIn:

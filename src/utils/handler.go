@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -30,7 +31,7 @@ func ParseID[T ~int | ~int64 | ~uint | ~uint64](context *gin.Context, paramName 
 	parsedID, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		context.Error(err)
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid ID"})
 		return id, err
 	}
 
@@ -38,4 +39,14 @@ func ParseID[T ~int | ~int64 | ~uint | ~uint64](context *gin.Context, paramName 
 	id = T(parsedID)
 
 	return id, nil
+}
+
+func ParseString(context *gin.Context, paramName string) (string, error) {
+	paramValue := context.Param(paramName)
+	if paramValue == "" {
+		context.Error(errors.New("param not found"))
+		context.JSON(http.StatusBadRequest, gin.H{"message": "param not found"})
+		return "", errors.New("param not found")
+	}
+	return paramValue, nil
 }

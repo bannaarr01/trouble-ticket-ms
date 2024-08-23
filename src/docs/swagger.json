@@ -4,7 +4,111 @@
         "contact": {}
     },
     "paths": {
+        "/attachments/ref/{ref}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "Attachments"
+                ],
+                "summary": "find an attachment by its ref",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attachment Ref",
+                        "name": "ref",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.AttachmentDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "Attachments"
+                ],
+                "summary": "remove an attachment by its ref",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attachment Ref",
+                        "name": "ref",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/attachments/{ticketId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "Attachments"
+                ],
+                "summary": "find attachments by a trouble ticket ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Trouble Ticket ID",
+                        "name": "ticketId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.AttachmentDTO"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -21,7 +125,7 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Attachment ID",
+                        "description": "Trouble Ticket ID",
                         "name": "ticketId",
                         "in": "path",
                         "required": true

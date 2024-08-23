@@ -15,10 +15,9 @@ func SerializeModelToDTO[T any, U any](models []T, serializeFunc func(T) U) []U 
 	return result
 }
 
-func StrPtr(s string) *string {
-	return &s
-}
-
+// TransformToDTO converts a slice of items(model) to a slice of DTOs Type provided.
+// It takes a slice of T and a function to convert T to DTO.
+// Returns a slice of DTO objects.
 func TransformToDTO[T any, DTO any](items []T, newDTOFunc func(T) DTO) []DTO {
 	return SerializeModelToDTO(items, newDTOFunc)
 }
