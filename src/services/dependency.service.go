@@ -14,6 +14,7 @@ type AppDependencies struct {
 	Context        context.Context
 	KeycloakCfg    config.KeyCloakConfig
 	RedisClient    *redis.Client
+	AppConfig      config.AppConfig
 }
 
 func InitAppDependencies() *AppDependencies {
@@ -46,5 +47,6 @@ func InitAppDependencies() *AppDependencies {
 		Context:        ctx,
 		KeycloakCfg:    cfg.KEYCLOAK,
 		RedisClient:    redisClient,
+		AppConfig:      cfg.APP,
 	}
 }

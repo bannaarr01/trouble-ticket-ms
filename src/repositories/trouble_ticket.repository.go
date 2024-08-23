@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"gorm.io/gorm"
+	"trouble-ticket-ms/src/db"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/utils"
 )
@@ -16,7 +16,7 @@ type TroubleTicketRepository interface {
 }
 
 type troubleTicketRepository struct {
-	db *gorm.DB
+	db *db.DB
 }
 
 func (t *troubleTicketRepository) Create(troubleTicket *models.TroubleTicket) error {
@@ -81,6 +81,6 @@ func (t *troubleTicketRepository) Update(troubleTicket *models.TroubleTicket, id
 	panic("implement me")
 }
 
-func NewTroubleTicketRepository(db *gorm.DB) TroubleTicketRepository {
+func NewTroubleTicketRepository(db *db.DB) TroubleTicketRepository {
 	return &troubleTicketRepository{db}
 }

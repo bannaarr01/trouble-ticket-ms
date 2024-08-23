@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"os"
+	"path/filepath"
 	"trouble-ticket-ms/src/docs"
 	"trouble-ticket-ms/src/logger"
 	"trouble-ticket-ms/src/middlewares"
@@ -20,6 +22,7 @@ type mainRouter struct {
 	appRouter           AppRouter
 	authRouter          AuthRouter
 	troubleTicketRouter TroubleTicketRouter
+	attachmentRouter    AttachmentRouter
 }
 
 func NewMainRouter(
@@ -27,12 +30,14 @@ func NewMainRouter(
 	appRouter AppRouter,
 	authRouter AuthRouter,
 	troubleTicketRouter TroubleTicketRouter,
+	attachmentRouter AttachmentRouter,
 ) MainRouter {
 	return &mainRouter{
 		deps,
 		appRouter,
 		authRouter,
 		troubleTicketRouter,
+		attachmentRouter,
 	}
 }
 
@@ -42,6 +47,7 @@ func (mainRtr *mainRouter) setRouting(server *gin.Engine, deps services.AppDepen
 	mainRtr.appRouter.SetAppRouting(server)
 	mainRtr.authRouter.SetAppRouting(server, deps)
 	mainRtr.troubleTicketRouter.SetAppRouting(server, deps)
+	mainRtr.attachmentRouter.SetAppRouting(server, deps)
 }
 
 // StartServer starts the server and returns an error if it fails.
@@ -49,9 +55,17 @@ func (mainRtr *mainRouter) setRouting(server *gin.Engine, deps services.AppDepen
 func (mainRtr *mainRouter) StartServer(deps services.AppDependencies) error {
 	server := gin.Default()
 
+	// cors
+	server.Use(middlewares.CORS())
+
 	// logger middleware
 	appLog, errorLog := logger.NewLoggers()
 	server.Use(middlewares.Log(appLog, errorLog))
+
+	// Serve static files from project root dir "/data/*" under "/static/attachment/file/" path
+	cwd, _ := os.Getwd()
+	dirPath := filepath.Join(cwd, "data")
+	server.Static("/static/attachment/file", dirPath)
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}

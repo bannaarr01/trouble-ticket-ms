@@ -5,6 +5,7 @@ import "time"
 // Attachment File(s) attached to the trouble ticket. e.g. picture of broken device, scanning of a bill or charge etc.
 type Attachment struct {
 	BaseModel
+	Ref             string `json:"ref"`
 	Type            string `json:"type"`
 	MimeType        string `json:"mime_type"`
 	OriginalName    string `json:"original_name"`
@@ -18,7 +19,7 @@ type Attachment struct {
 
 // AttachmentDTO a data transfer object for an attachment.
 type AttachmentDTO struct {
-	ID           uint64    `json:"id"`
+	Ref          string    `json:"ref"`
 	Type         string    `json:"type"`
 	MimeType     string    `json:"mime_type"`
 	OriginalName string    `json:"original_name"`
@@ -34,7 +35,7 @@ type AttachmentDTO struct {
 // NewAttachmentDTO creates a new AttachmentDTO instance from an Attachment entity.
 func NewAttachmentDTO(attachment Attachment) AttachmentDTO {
 	return AttachmentDTO{
-		ID:           attachment.ID,
+		Ref:          attachment.Ref,
 		Type:         attachment.Type,
 		MimeType:     attachment.MimeType,
 		OriginalName: attachment.OriginalName,

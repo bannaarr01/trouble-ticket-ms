@@ -8,6 +8,7 @@ type Config struct {
 	DB       DBConfig
 	KEYCLOAK KeyCloakConfig
 	REDIS    RedisConfig
+	APP      AppConfig
 }
 
 type DBConfig struct {
@@ -30,6 +31,10 @@ type KeyCloakConfig struct {
 type RedisConfig struct {
 	Host string
 	Port string
+}
+
+type AppConfig struct {
+	AttachmentHost string
 }
 
 var cfg Config
@@ -67,6 +72,10 @@ func init() {
 	cfg.REDIS = RedisConfig{
 		Host: os.Getenv("REDIS_HOST"),
 		Port: os.Getenv("REDIS_PORT"),
+	}
+
+	cfg.APP = AppConfig{
+		AttachmentHost: os.Getenv("ATTACHMENT_HOST"),
 	}
 
 }

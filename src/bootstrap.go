@@ -14,23 +14,33 @@ func bootstrap(dbConn *db.DB) {
 	dependencies := services.InitAppDependencies()
 
 	// repositories
-	troubleTicketRepo := repositories.NewTroubleTicketRepository(dbConn.DB)
+	attachmentRepo := repositories.NewAttachmentRepository(dbConn)
+	troubleTicketRepo := repositories.NewTroubleTicketRepository(dbConn)
 
 	// services
 	authService := services.NewAuthService(*dependencies)
+	attachmentService := services.NewAttachmentService(attachmentRepo, *dependencies)
 	troubleTicketService := services.NewTroubleTicketService(troubleTicketRepo)
 
 	// controllers
 	appController := controllers.NewAppController()
 	authController := controllers.NewAuthController(authService)
+	attachmentController := controllers.NewAttachmentController(attachmentService)
 	troubleTicketController := controllers.NewTroubleTicketController(troubleTicketService)
 
 	// routers
 	appRouter := routers.NewAppRouter(appController)
 	authRouter := routers.NewAuthRouter(authController, *dependencies)
+	attachmentRouter := routers.NewAttachmentRouter(attachmentController, *dependencies)
 	troubleTicketRouter := routers.NewTroubleTicketRouter(troubleTicketController, *dependencies)
 	// main router (putting all together)
-	mainRouter := routers.NewMainRouter(*dependencies, appRouter, authRouter, troubleTicketRouter)
+	mainRouter := routers.NewMainRouter(
+		*dependencies,
+		appRouter,
+		authRouter,
+		troubleTicketRouter,
+		attachmentRouter,
+	)
 
 	// start server
 	if err := mainRouter.StartServer(*dependencies); err != nil {

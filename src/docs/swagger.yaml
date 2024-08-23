@@ -7,8 +7,6 @@ definitions:
         type: string
       description:
         type: string
-      id:
-        type: integer
       mime_type:
         type: string
       name:
@@ -16,6 +14,8 @@ definitions:
       original_name:
         type: string
       path:
+        type: string
+      ref:
         type: string
       size:
         type: integer
@@ -283,6 +283,34 @@ definitions:
 info:
   contact: {}
 paths:
+  /attachments/{ticketId}:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Attachment ID
+        in: path
+        name: ticketId
+        required: true
+        type: integer
+      - description: Attachment file
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AttachmentDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: upload an attachment for a trouble ticket
+      tags:
+      - Attachments
   /auth/signIn:
     post:
       parameters:
