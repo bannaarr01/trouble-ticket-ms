@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"mime/multipart"
 	"net/http"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/services"
@@ -32,13 +33,9 @@ func (a *attachmentController) Upload(context *gin.Context) {
 		return // Err resp has already been set
 	}
 
-	file, fileHeader, err := context.Request.FormFile("file")
-	if err != nil {
-		context.Error(err)
-		context.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
+	// available after file middleware
+	file, _ := context.MustGet("file").(multipart.File)
+	fileHeader, _ := context.MustGet("fileHeader").(*multipart.FileHeader)
 	defer file.Close()
 
 	// user will be available after passing through auth guard middleware

@@ -31,7 +31,8 @@ func (aRtr *attachmentRouter) SetAppRouting(server *gin.Engine, deps services.Ap
 		attachments := v1.Group("/attachments").
 			Use(middlewares.AuthGuard(deps), middlewares.RoleGuard(allowedRoles...))
 		{
-			attachments.POST(":ticketId", aRtr.attachmentController.Upload)
+			// Apply File Validator Middleware
+			attachments.POST(":ticketId", middlewares.FileValidator(), aRtr.attachmentController.Upload)
 		}
 	}
 
