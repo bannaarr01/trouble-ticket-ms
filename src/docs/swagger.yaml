@@ -441,7 +441,52 @@ paths:
       summary: Sign Up
       tags:
       - Auth
+  /externalIdentifiers/{id}:
+    delete:
+      parameters:
+      - description: External Identifier ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: remove an external Identifier by its id
+      tags:
+      - External Identifiers
   /externalIdentifiers/ticket/{id}:
+    get:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/models.ExternalIdentifierDTO'
+              type: array
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: find external Identifiers by a trouble ticket ID
+      tags:
+      - External Identifiers
     post:
       parameters:
       - description: Trouble Ticket ID

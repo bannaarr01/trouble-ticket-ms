@@ -34,7 +34,6 @@ func (extRtr *extIdentifierRouter) SetAppRouting(server *gin.Engine, deps servic
 			attachments.POST("/ticket/:id", extRtr.extIdentifierController.Create)
 			attachments.GET("/ticket/:id", extRtr.extIdentifierController.FindByTicket)
 			attachments.DELETE(":id", extRtr.extIdentifierController.Remove)
-			attachments.GET(":id", extRtr.extIdentifierController.FindOne)
 		}
 	}
 

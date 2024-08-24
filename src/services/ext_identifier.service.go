@@ -3,13 +3,13 @@ package services
 import (
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/repositories"
+	"trouble-ticket-ms/src/utils"
 )
 
 type ExtIdentifierService interface {
 	Create(string, uint64, *models.CreateExternalIdentifierDTO) (*models.ExternalIdentifierDTO, error)
-	FindOne(string) (*models.AttachmentDTO, error)
-	FindByTicket(uint64) ([]models.AttachmentDTO, error)
-	Remove(string) error
+	FindByTicket(uint64) ([]models.ExternalIdentifierDTO, error)
+	Remove(uint64) error
 }
 
 type extIdentifierService struct {
@@ -29,19 +29,25 @@ func (e *extIdentifierService) Create(authUserName string, troubleTicketId uint6
 	return &externalIdentifierDto, nil
 }
 
-func (e *extIdentifierService) FindOne(s string) (*models.AttachmentDTO, error) {
-	//TODO implement me
-	panic("implement me")
+func (e *extIdentifierService) FindByTicket(ticketId uint64) ([]models.ExternalIdentifierDTO, error) {
+	var extIdentifiers []models.ExternalIdentifier
+	err := e.extIdentifierRepository.FindByTicket(&extIdentifiers, ticketId)
+
+	if err != nil {
+		return nil, err
+	}
+	extIdentifiersDTOs := utils.TransformToDTO(extIdentifiers, models.NewExternalIdentifierDTO)
+	return extIdentifiersDTOs, nil
 }
 
-func (e *extIdentifierService) FindByTicket(u uint64) ([]models.AttachmentDTO, error) {
-	//TODO implement me
-	panic("implement me")
-}
+func (e *extIdentifierService) Remove(extIdentifierID uint64) error {
+	err := e.extIdentifierRepository.Remove(extIdentifierID)
 
-func (e *extIdentifierService) Remove(s string) error {
-	//TODO implement me
-	panic("implement me")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewExtIdentifierService(extRepo repositories.ExtIdentifierRepository, deps AppDependencies) ExtIdentifierService {

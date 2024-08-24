@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"gorm.io/gorm"
 	"trouble-ticket-ms/src/db"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/utils"
@@ -9,9 +10,8 @@ import (
 
 type ExtIdentifierRepository interface {
 	Save(*models.ExternalIdentifier) error
-	FindOne(string) (*models.ExternalIdentifier, error)
 	FindByTicket(*[]models.ExternalIdentifier, uint64) error
-	Remove(string) error
+	Remove(uint64) error
 }
 
 type extIdentifierRepository struct {
@@ -48,19 +48,36 @@ func (e *extIdentifierRepository) Save(extId *models.ExternalIdentifier) error {
 	return nil
 }
 
-func (e *extIdentifierRepository) FindOne(s string) (*models.ExternalIdentifier, error) {
-	//TODO implement me
-	panic("implement me")
+func (e *extIdentifierRepository) FindByTicket(extIdentifier *[]models.ExternalIdentifier, ticketId uint64) error {
+	return e.db.Transaction(func(tx *gorm.DB) error {
+		// Check if the related record exists
+		if err := utils.CheckRelatedRecordExists(tx, &models.TroubleTicket{}, ticketId, "id"); err != nil {
+			return err
+		}
+
+		// If ticket exists, find extId
+		result := tx.Where("trouble_ticket_id = ?", ticketId).
+			Preload("Type").
+			Find(&extIdentifier)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		return nil
+	})
 }
 
-func (e *extIdentifierRepository) FindByTicket(extIdentifier *[]models.ExternalIdentifier, u uint64) error {
-	//TODO implement me
-	panic("implement me")
-}
+func (e *extIdentifierRepository) Remove(extIdentifierID uint64) error {
+	result := e.db.Where("id = ?", extIdentifierID).Delete(&models.ExternalIdentifier{})
 
-func (e *extIdentifierRepository) Remove(s string) error {
-	//TODO implement me
-	panic("implement me")
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("external Identifier record with id:%d does not exist", extIdentifierID)
+	}
+
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func NewExtIdentifierRepository(db *db.DB) ExtIdentifierRepository {

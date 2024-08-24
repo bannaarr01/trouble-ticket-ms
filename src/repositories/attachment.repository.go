@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"trouble-ticket-ms/src/db"
 	"trouble-ticket-ms/src/models"
+	"trouble-ticket-ms/src/utils"
 )
 
 type AttachmentRepository interface {
@@ -22,11 +23,7 @@ type attachmentRepository struct {
 func (a *attachmentRepository) FindByTicket(attachments *[]models.Attachment, ticketId uint64) error {
 	return a.db.Transaction(func(tx *gorm.DB) error {
 		// First, check if the ticket exists
-		var ticket models.TroubleTicket
-		if err := tx.First(&ticket, "id = ?", ticketId).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return errors.New("invalid ticket ID")
-			}
+		if err := utils.CheckRelatedRecordExists(tx, &models.TroubleTicket{}, ticketId, "id"); err != nil {
 			return err
 		}
 

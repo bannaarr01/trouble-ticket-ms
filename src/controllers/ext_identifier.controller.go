@@ -10,7 +10,6 @@ import (
 
 type ExtIdentifierController interface {
 	Create(*gin.Context)
-	FindOne(*gin.Context)
 	FindByTicket(*gin.Context)
 	Remove(*gin.Context)
 }
@@ -52,19 +51,54 @@ func (e *extIdentifierController) Create(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"data": extIdentifier})
 }
 
-func (e *extIdentifierController) FindOne(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
-}
-
+// FindByTicket External Identifier
+// @Summary find external Identifiers by a trouble ticket ID
+// @Tags External Identifiers
+// @Param id path int true "Trouble Ticket ID"
+// @Success 200 {array} []models.ExternalIdentifierDTO
+// @Failure 500 {object} error
+// @Router /externalIdentifiers/ticket/{id} [get]
+// @Security Bearer
 func (e *extIdentifierController) FindByTicket(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	troubleTicketID, err := utils.ParseID[uint64](context, "id")
+	if err != nil {
+		return // Err resp has already been set
+	}
+
+	externalIdentifiers, err := e.extIdentifierService.FindByTicket(troubleTicketID)
+
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"data": externalIdentifiers})
 }
 
+// Remove an External Identifier
+// @Summary remove an external Identifier by its id
+// @Tags External Identifiers
+// @Param id path int true "External Identifier ID"
+// @Success 200 {object} any
+// @Failure 500 {object} error
+// @Router /externalIdentifiers/{id} [delete]
+// @Security Bearer
 func (e *extIdentifierController) Remove(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	externalIdentifierID, err := utils.ParseID[uint64](context, "id")
+	if err != nil {
+		return // Err resp has already been set
+	}
+
+	err = e.extIdentifierService.Remove(externalIdentifierID)
+
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "ok"})
 }
 
 func NewExtIdentifierController(ext services.ExtIdentifierService) ExtIdentifierController {
