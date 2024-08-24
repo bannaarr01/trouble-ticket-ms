@@ -59,6 +59,19 @@ definitions:
       name:
         type: string
     type: object
+  models.CreateTroubleTicketDTO:
+    properties:
+      channel_id:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+      requested_resolution_date:
+        type: string
+      type_id:
+        type: integer
+    type: object
   models.ExternalIdentifierDTO:
     properties:
       id:
@@ -434,6 +447,27 @@ paths:
       security:
       - Bearer: []
       summary: fetch all trouble tickets
+      tags:
+      - Trouble Tickets
+    post:
+      parameters:
+      - description: Create New Ticket info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTroubleTicketDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TroubleTicketDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Create a trouble ticket
       tags:
       - Trouble Tickets
   /troubleTickets/filters:

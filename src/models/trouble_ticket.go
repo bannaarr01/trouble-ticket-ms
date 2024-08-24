@@ -33,7 +33,6 @@ type TroubleTicket struct {
 }
 
 type BaseTroubleTicketDTO struct {
-	Ref                     string               `json:"ref"`
 	Name                    string               `json:"name"`
 	Description             string               `json:"description"`
 	RequestedResolutionDate *time.Time           `json:"requested_resolution_date"`
@@ -70,12 +69,11 @@ type TroubleTicketDTO struct {
 }
 
 type CreateTroubleTicketDTO struct {
-	BaseTroubleTicketDTO
-	TypeID     uint64 `json:"type_id"`
-	StatusID   uint64 `json:"status_id"`
-	ChannelID  uint64 `json:"channel_id"`
-	PriorityID uint64 `json:"priority_id"`
-	SeverityID uint64 `json:"severity_id"`
+	Name                    string     `json:"name"`
+	Description             string     `json:"description"`
+	TypeID                  uint64     `json:"type_id"`
+	ChannelID               uint64     `json:"channel_id"`
+	RequestedResolutionDate *time.Time `json:"requested_resolution_date"`
 }
 
 type UpdateTroubleTicketDTO struct {
@@ -84,16 +82,12 @@ type UpdateTroubleTicketDTO struct {
 	ResolutionDate         time.Time `json:"resolution_date"`
 }
 
-type TroubleTicketsDTO struct {
-	TroubleTickets []TroubleTicketDTO `json:"trouble_tickets"`
-}
-
 func NewPartialTroubleTicketDTO(ref, name, description string) PartialTroubleTicketDTO {
 	return PartialTroubleTicketDTO{ref, name, description}
 }
 
 // NewTroubleTicketDTO converts a TroubleTicket model to TroubleTicketDTO.
-func NewTroubleTicketDTO(ticket TroubleTicket) TroubleTicketDTO {
+func NewTroubleTicketDTO(ticket *TroubleTicket) TroubleTicketDTO {
 	return TroubleTicketDTO{
 		PartialTroubleTicketDTO: NewPartialTroubleTicketDTO(ticket.Ref, ticket.Name, ticket.Description),
 		ExpectedResolutionDate:  ticket.ExpectedResolutionDate,
@@ -113,4 +107,28 @@ func NewTroubleTicketDTO(ticket TroubleTicket) TroubleTicketDTO {
 		Attachments:         utils.TransformToDTO(ticket.Attachments, NewAttachmentDTO),
 		Notes:               utils.TransformToDTO(ticket.Notes, NewNoteDTO),
 	}
+}
+
+func NewTroubleTicket(
+	c CreateTroubleTicketDTO,
+	ref string,
+	statusId, priorityId, severityId uint64,
+	requestedResolutionDate *time.Time,
+	expectedResolutionDate *time.Time,
+	opts ...BaseModelOption,
+) TroubleTicket {
+	troubleTicket := TroubleTicket{
+		Ref:                     ref,
+		Name:                    c.Name,
+		Description:             c.Description,
+		TypeID:                  c.TypeID,
+		StatusID:                statusId,
+		ChannelID:               c.ChannelID,
+		PriorityID:              priorityId,
+		SeverityID:              severityId,
+		RequestedResolutionDate: requestedResolutionDate,
+		ExpectedResolutionDate:  expectedResolutionDate,
+	}
+	ApplyBaseMOptions(&troubleTicket.BaseModel, opts...)
+	return troubleTicket
 }

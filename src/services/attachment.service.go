@@ -19,13 +19,6 @@ type AttachmentService interface {
 	FindOne(string) (*models.AttachmentDTO, error)
 	FindByTicket(uint64) ([]models.AttachmentDTO, error)
 	Remove(string) error
-	// private
-	createDirIfNotExists() (*string, error)
-	getMimeType(string) string
-	writeToFile(string, []byte) error
-	generateUniqueFileName() string
-	createAttachment(*models.Claims, *multipart.FileHeader, uint64, string, string, string) *models.Attachment
-	generateURL(string, string) string
 }
 
 type attachmentService struct {
@@ -64,17 +57,17 @@ func (a *attachmentService) FindOne(ref string) (*models.AttachmentDTO, error) {
 	return &attachmentDTO, nil
 }
 
-func (a *attachmentService) createAttachment(
+func createAttachment(
 	user *models.Claims,
 	fileHeader *multipart.FileHeader,
 	troubleTicketId uint64,
-	uniqueFileName, fileExt, dirPath string,
+	attachmentHost, uniqueFileName, fileExt, dirPath string,
 ) *models.Attachment {
 
 	size := fileHeader.Size
-	ref := a.generateUniqueFileName()
-	mimeType := a.getMimeType(fileExt)
-	url := a.generateURL(uniqueFileName, fileExt)
+	ref := generateUniqueFileName()
+	mimeType := getMimeType(fileExt)
+	url := generateURL(attachmentHost, uniqueFileName, fileExt)
 
 	return &models.Attachment{
 		BaseModel: models.BaseModel{
@@ -93,11 +86,11 @@ func (a *attachmentService) createAttachment(
 	}
 }
 
-func (a *attachmentService) generateURL(uniqueFileName, fileExt string) string {
-	return a.deps.AppConfig.AttachmentHost + "/static/attachment/file/" + uniqueFileName + fileExt
+func generateURL(attachmentHost, uniqueFileName, fileExt string) string {
+	return attachmentHost + "/static/attachment/file/" + uniqueFileName + fileExt
 }
 
-func (a *attachmentService) getMimeType(fileExtension string) string {
+func getMimeType(fileExtension string) string {
 	mimeType := mime.TypeByExtension(fileExtension)
 	if mimeType == "" {
 		mimeType = "application/octet-stream"
@@ -105,12 +98,12 @@ func (a *attachmentService) getMimeType(fileExtension string) string {
 	return mimeType
 }
 
-func (a *attachmentService) generateUniqueFileName() string {
+func generateUniqueFileName() string {
 	// Combine UUID and timestamp to create a unique filename
 	return fmt.Sprintf("%d-%s", time.Now().Unix(), uuid.New().String())
 }
 
-func (a *attachmentService) writeToFile(filePath string, content []byte) error {
+func writeFile(filePath string, content []byte) error {
 	err := os.WriteFile(filePath, content, 0644)
 	if err != nil {
 		return fmt.Errorf("error writing to file %w", err)
@@ -119,7 +112,7 @@ func (a *attachmentService) writeToFile(filePath string, content []byte) error {
 }
 
 // createDirIfNotExists checks app root dir if data dir exists, creates if not & returns its path
-func (a *attachmentService) createDirIfNotExists() (*string, error) {
+func createDirIfNotExists() (*string, error) {
 	cwd, err := os.Getwd()
 
 	if err != nil {
@@ -139,7 +132,7 @@ func (a *attachmentService) createDirIfNotExists() (*string, error) {
 }
 
 func (a *attachmentService) Save(troubleTicketID uint64, user *models.Claims, file *multipart.File, fileHeader *multipart.FileHeader) (*models.AttachmentDTO, error) {
-	dirPath, err := a.createDirIfNotExists()
+	dirPath, err := createDirIfNotExists()
 	if err != nil {
 		return nil, err
 	}
@@ -150,16 +143,17 @@ func (a *attachmentService) Save(troubleTicketID uint64, user *models.Claims, fi
 	}
 
 	fileName := fileHeader.Filename
-	uniqueFileName := a.generateUniqueFileName()
+	uniqueFileName := generateUniqueFileName()
 	fileExt := filepath.Ext(fileName)
 	filePath := filepath.Join(*dirPath, uniqueFileName+fileExt)
+	attachmentHost := a.deps.AppConfig.AttachmentHost
 
-	err = a.writeToFile(filePath, fileBytes)
+	err = writeFile(filePath, fileBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	attachment := a.createAttachment(user, fileHeader, troubleTicketID, uniqueFileName, fileExt, *dirPath)
+	attachment := createAttachment(user, fileHeader, troubleTicketID, attachmentHost, uniqueFileName, fileExt, *dirPath)
 
 	savedAttachment, err := a.attachmentRepository.Save(attachment)
 	if err != nil {

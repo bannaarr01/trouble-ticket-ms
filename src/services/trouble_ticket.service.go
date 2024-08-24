@@ -7,7 +7,7 @@ import (
 )
 
 type TroubleTicketService interface {
-	Create()
+	Create(string, *models.CreateTroubleTicketDTO) (*models.TroubleTicketDTO, error)
 	FindAll() ([]models.TroubleTicketDTO, error)
 	FindOne()
 	Remove()
@@ -50,7 +50,7 @@ func (t *troubleTicketService) FindAll() ([]models.TroubleTicketDTO, error) {
 
 		// Add a new goroutine to the errgroup that converts the tickets to a DTO and appends it to the result slice.
 		g.Go(func() error {
-			dto := models.NewTroubleTicketDTO(ticket)
+			dto := models.NewTroubleTicketDTO(&ticket)
 			troubleTicketDTOs = append(troubleTicketDTOs, dto)
 			return nil
 		})
@@ -71,9 +71,16 @@ func (t *troubleTicketService) FindOne() {
 	panic("implement me")
 }
 
-func (t *troubleTicketService) Create() {
-	//TODO implement me
-	panic("implement me")
+func (t *troubleTicketService) Create(authUserName string, cDto *models.CreateTroubleTicketDTO) (*models.TroubleTicketDTO, error) {
+	ticket, err := t.troubleTicketRepository.Create(authUserName, cDto)
+
+	if err != nil {
+		return nil, err
+	}
+
+	troubleTicketDTO := models.NewTroubleTicketDTO(ticket)
+
+	return &troubleTicketDTO, nil
 }
 
 func (t *troubleTicketService) Remove() {

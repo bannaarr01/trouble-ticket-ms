@@ -32,3 +32,14 @@ func NewStatusChangeDTO(statusChange StatusChange) StatusChangeDTO {
 		Status:    NewStatusDTO(statusChange.Status),
 	}
 }
+
+func NewStatusChange(reason string, statusId, ticketId uint64, opts ...BaseModelOption) StatusChange {
+	statusChange := StatusChange{
+		BaseModel:       BaseModel{},
+		Reason:          reason,
+		StatusID:        statusId,
+		TroubleTicketID: ticketId,
+	}
+	ApplyBaseMOptions(&statusChange.BaseModel, opts...)
+	return statusChange
+}

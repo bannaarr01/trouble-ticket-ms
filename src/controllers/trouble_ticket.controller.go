@@ -5,7 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/services"
+	"trouble-ticket-ms/src/utils"
 )
 
 type TroubleTicketController interface {
@@ -21,13 +23,35 @@ type troubleTicketController struct {
 	troubleTicketService services.TroubleTicketService
 }
 
+// Create new trouble ticket
+// @Summary Create a trouble ticket
+// @Tags Trouble Tickets
+// @Param  request body  models.CreateTroubleTicketDTO  true  "Create New Ticket info"
+// @Success 200 {object} models.TroubleTicketDTO
+// @Failure 500 {object} error
+// @Router /troubleTickets [post]
+// @Security Bearer
 func (t *troubleTicketController) Create(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	var createTroubleTicketDTO models.CreateTroubleTicketDTO
+
+	if !utils.BindJSON(context, &createTroubleTicketDTO) {
+		return
+	}
+
+	authUser := context.MustGet("user").(*models.Claims)
+
+	createdTicket, err := t.troubleTicketService.Create(authUser.PreferredUsername, &createTroubleTicketDTO)
+
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": createdTicket})
 }
 
-//	FindAllFilter related to TroubleTicket
-//
+// FindAllFilter related to TroubleTicket
 // @Summary fetch all related trouble tickets filters / dropdown
 // @Tags Trouble Tickets
 // @Success 200 {array} models.FiltersDTO

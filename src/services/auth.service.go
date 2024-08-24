@@ -9,15 +9,6 @@ import (
 type AuthService interface {
 	SignIn(models.Auth) (*gocloak.JWT, error)
 	SignUp(models.SignUpDTO) (*gocloak.User, error)
-	//private
-	loginToKeycloak() (string, error)
-	createUser(string, models.SignUpDTO) (*gocloak.User, error)
-	setPassword(string, string, string) error
-	assignRoles(string, string, []string) error
-	getRealmRoles(string, []string) ([]gocloak.Role, error)
-	getUserByID(string, string) (*gocloak.User, error)
-	handleError(string, string, error) error
-	deleteUserWithRetry(string, string) error
 }
 
 type authService struct {

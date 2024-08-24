@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"reflect"
+	"time"
+)
 
 type BaseModelOption func(model *BaseModel)
 
@@ -30,5 +33,26 @@ func NewBaseModel(bm BaseModel) BaseModel {
 func ApplyBaseMOptions(target *BaseModel, opts ...BaseModelOption) {
 	for _, opt := range opts {
 		opt(target)
+	}
+}
+
+// SetField sets the value of a field in a BaseModel.
+// Args:
+//
+//	fieldName: The name of the field to set.
+//	value: The value to set the field to.
+//
+// Returns:
+//
+//	A BaseModelOption that sets the field when applied to a BaseModel.
+func SetField(fieldName string, value interface{}) BaseModelOption {
+	return func(bm *BaseModel) {
+		v := reflect.ValueOf(bm).Elem()
+		if v.IsValid() {
+			field := v.FieldByName(fieldName)
+			if field.IsValid() && field.CanSet() {
+				field.Set(reflect.ValueOf(value))
+			}
+		}
 	}
 }
