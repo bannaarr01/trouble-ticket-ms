@@ -21,3 +21,11 @@ func SerializeModelToDTO[T any, U any](models []T, serializeFunc func(T) U) []U 
 func TransformToDTO[T any, DTO any](items []T, newDTOFunc func(T) DTO) []DTO {
 	return SerializeModelToDTO(items, newDTOFunc)
 }
+
+func DerefPtr[T any](ptr *T) T {
+	if ptr != nil {
+		return *ptr
+	}
+	var zero T
+	return zero
+}

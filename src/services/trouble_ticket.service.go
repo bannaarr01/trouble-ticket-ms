@@ -1,16 +1,16 @@
 package services
 
 import (
-	"golang.org/x/sync/errgroup"
 	"trouble-ticket-ms/src/models"
 	"trouble-ticket-ms/src/repositories"
+	"trouble-ticket-ms/src/utils"
 )
 
 type TroubleTicketService interface {
 	Create(string, *models.CreateTroubleTicketDTO) (*models.TroubleTicketDTO, error)
-	FindAll() ([]models.TroubleTicketDTO, error)
-	FindOne()
-	Remove()
+	FindAll(*models.Claims, *models.GetTroubleTicketQuery) (*models.PaginatedTroubleTickets, error)
+	FindOne(uint64, *models.Claims) (*models.TroubleTicketDTO, error)
+	Remove(uint64, *models.Claims) error
 	FindAllFilter() (models.FiltersDTO, error)
 }
 
@@ -31,44 +31,36 @@ func (t *troubleTicketService) FindAllFilter() (models.FiltersDTO, error) {
 	return filterDto, nil
 }
 
-// FindAll retrieves all trouble tickets from the trouble ticket repo and returns them as a slice of TroubleTicketDTOs.
-func (t *troubleTicketService) FindAll() ([]models.TroubleTicketDTO, error) {
+// FindAll retrieves all trouble tickets based on query params and return PaginatedTroubleTickets
+func (t *troubleTicketService) FindAll(authUser *models.Claims, query *models.GetTroubleTicketQuery) (*models.PaginatedTroubleTickets, error) {
 	var troubleTickets []models.TroubleTicket
 
-	if err := t.troubleTicketRepository.FindAll(&troubleTickets); err != nil {
+	totalCount, err := t.troubleTicketRepository.FindAll(authUser, query, &troubleTickets)
+	if err != nil {
 		return nil, err
 	}
 
-	// Create an errgroup.Group to manage the concurrent conversion of trouble tickets to DTOs.
-	var g errgroup.Group
-	var troubleTicketDTOs []models.TroubleTicketDTO
-
-	// Iterate over the retrieved trouble tickets.
-	for _, trbTicket := range troubleTickets {
-		// Capture the loop variable to avoid issues with concurrent access.
-		ticket := trbTicket
-
-		// Add a new goroutine to the errgroup that converts the tickets to a DTO and appends it to the result slice.
-		g.Go(func() error {
-			dto := models.NewTroubleTicketDTO(&ticket)
-			troubleTicketDTOs = append(troubleTicketDTOs, dto)
-			return nil
+	troubleTicketsDTOs := utils.TransformToDTO(troubleTickets,
+		func(ticket models.TroubleTicket) models.TroubleTicketDTO {
+			return models.NewTroubleTicketDTO(&ticket)
 		})
-	}
 
-	// Wait for all goroutines in the errgroup to complete.
-	// If any goroutine returns an error, return immediately with the error.
-	if err := g.Wait(); err != nil {
-		return nil, err
-	}
-
-	// Return the slice of trouble ticket DTOs.
-	return troubleTicketDTOs, nil
+	return &models.PaginatedTroubleTickets{
+		TotalCount: totalCount,
+		Limit:      query.Limit,
+		Offset:     query.Offset,
+		Data:       troubleTicketsDTOs,
+	}, nil
 }
 
-func (t *troubleTicketService) FindOne() {
-	//TODO implement me
-	panic("implement me")
+func (t *troubleTicketService) FindOne(ticketId uint64, authUser *models.Claims) (*models.TroubleTicketDTO, error) {
+	foundTicket, err := t.troubleTicketRepository.FindOne(ticketId, authUser)
+	if err != nil {
+		return nil, err
+	}
+
+	troubleTicketDTO := models.NewTroubleTicketDTO(foundTicket)
+	return &troubleTicketDTO, nil
 }
 
 func (t *troubleTicketService) Create(authUserName string, cDto *models.CreateTroubleTicketDTO) (*models.TroubleTicketDTO, error) {
@@ -83,9 +75,14 @@ func (t *troubleTicketService) Create(authUserName string, cDto *models.CreateTr
 	return &troubleTicketDTO, nil
 }
 
-func (t *troubleTicketService) Remove() {
-	//TODO implement me
-	panic("implement me")
+func (t *troubleTicketService) Remove(ticketId uint64, authUser *models.Claims) error {
+	err := t.troubleTicketRepository.Remove(ticketId, authUser)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewTroubleTicketService(tRepo repositories.TroubleTicketRepository) TroubleTicketService {

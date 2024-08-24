@@ -39,9 +39,9 @@ func (tRtr *troubleTicketRouter) SetAppRouting(server *gin.Engine, deps services
 			troubleTickets.POST("", tRtr.troubleTicketController.Create)
 			//show all if admin only, show only mine if not admin
 			troubleTickets.GET("", tRtr.troubleTicketController.FindAll)
-			//troubleTickets.GET("/:id", tRtr.troubleTicketController.FindOne)
+			troubleTickets.GET(":id", tRtr.troubleTicketController.FindOne)
 			//troubleTickets.PATCH("/:id", tRtr.troubleTicketController.Update)
-			//troubleTickets.DELETE("/:id", tRtr.troubleTicketController.Remove)
+			troubleTickets.DELETE(":id", tRtr.troubleTicketController.Remove)
 		}
 	}
 

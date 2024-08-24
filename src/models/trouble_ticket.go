@@ -32,16 +32,27 @@ type TroubleTicket struct {
 	Priority Priority `gorm:"foreignKey:PriorityID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
-type BaseTroubleTicketDTO struct {
-	Name                    string               `json:"name"`
-	Description             string               `json:"description"`
-	RequestedResolutionDate *time.Time           `json:"requested_resolution_date"`
-	ExternalIdentifiers     []ExternalIdentifier `json:"external_identifiers"`
-	RelatedEntities         []RelatedEntity      `json:"related_entities"`
-	RelatedParties          []RelatedParty       `json:"related_parties"`
-	StatusChanges           []StatusChange       `json:"status_changes"`
-	Attachments             []Attachment         `json:"attachments"`
-	Notes                   []Note               `json:"notes"`
+type GetTroubleTicketQuery struct {
+	Limit             uint64  `form:"limit,default=10" binding:"min=1,max=100"`
+	Offset            uint64  `form:"offset,default=0" binding:"min=0"`
+	Ref               *string `form:"ref"`
+	Name              *string `form:"name"`
+	TypeID            *uint64 `form:"type_id"`
+	StatusID          *uint64 `form:"status_id"`
+	ChannelID         *uint64 `form:"channel_id"`
+	SeverityID        *uint64 `form:"severity_id"`
+	PriorityID        *uint64 `form:"priority_id"`
+	ExternalIDOwner   *string `form:"external_id_owner"`
+	RelatedPartyEmail *string `form:"related_party_email"`
+	RelatedEntityRef  *string `form:"related_entity_ref"`
+	NoteAuthor        *string `form:"note_author"`
+}
+
+type PaginatedTroubleTickets struct {
+	TotalCount int64              `json:"total_count"`
+	Limit      uint64             `json:"limit"`
+	Offset     uint64             `json:"offset"`
+	Data       []TroubleTicketDTO `json:"data"`
 }
 
 type PartialTroubleTicketDTO struct {

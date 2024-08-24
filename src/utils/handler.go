@@ -50,3 +50,15 @@ func ParseString(context *gin.Context, paramName string) (string, error) {
 	}
 	return paramValue, nil
 }
+
+func BindQuery(context *gin.Context, target interface{}) bool {
+	err := context.ShouldBindQuery(target)
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid query parameters"})
+		context.Abort()
+		return false
+	}
+
+	return true
+}

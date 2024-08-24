@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
 	"math/rand"
@@ -13,15 +14,112 @@ import (
 
 type TroubleTicketRepository interface {
 	Create(string, *models.CreateTroubleTicketDTO) (*models.TroubleTicket, error)
-	FindAll(*[]models.TroubleTicket) error
-	FindOne(*models.TroubleTicket, string) error
-	Remove(*models.TroubleTicket) error
+	FindAll(*models.Claims, *models.GetTroubleTicketQuery, *[]models.TroubleTicket) (int64, error)
+	FindOne(uint64, *models.Claims) (*models.TroubleTicket, error)
+	Remove(uint64, *models.Claims) error
 	Update(*models.TroubleTicket, string) error
 	FindAllFilter(*models.Filters) error
 }
 
 type troubleTicketRepository struct {
 	db *db.DB
+}
+
+func (t *troubleTicketRepository) FindAll(
+	authUser *models.Claims,
+	query *models.GetTroubleTicketQuery,
+	troubleTickets *[]models.TroubleTicket,
+) (int64, error) {
+	// Base query
+	baseQuery := t.db.DB.
+		//Debug().
+		Model(&models.TroubleTicket{}).
+		Joins("LEFT JOIN external_identifiers e ON e.trouble_ticket_id = trouble_tickets.id").
+		Joins("LEFT JOIN related_parties r ON r.trouble_ticket_id = trouble_tickets.id").
+		Joins("LEFT JOIN related_entities l on l.trouble_ticket_id = trouble_tickets.id").
+		Joins("LEFT JOIN notes n on n.trouble_ticket_id = trouble_tickets.id")
+
+	// Build WHERE clause
+	whereClause := "trouble_tickets.deleted_at IS NULL"
+	args := []interface{}{}
+
+	if !isAdmin(authUser) {
+		whereClause += " AND trouble_tickets.created_by = ?"
+		args = append(args, authUser.PreferredUsername)
+	}
+
+	// Add filters
+	if query.Ref != nil {
+		whereClause += " AND trouble_tickets.ref = ?"
+		args = append(args, utils.DerefPtr(query.Ref))
+	}
+	if query.Name != nil {
+		whereClause += " AND trouble_tickets.name LIKE ?"
+		args = append(args, "%"+utils.DerefPtr(query.Name)+"%")
+	}
+	if query.TypeID != nil {
+		whereClause += " AND trouble_tickets.type_id = ?"
+		args = append(args, utils.DerefPtr(query.TypeID))
+	}
+	if query.StatusID != nil {
+		whereClause += " AND trouble_tickets.status_id = ?"
+		args = append(args, utils.DerefPtr(query.StatusID))
+	}
+	if query.ChannelID != nil {
+		whereClause += " AND trouble_tickets.channel_id = ?"
+		args = append(args, utils.DerefPtr(query.ChannelID))
+	}
+	if query.SeverityID != nil {
+		whereClause += " AND trouble_tickets.severity_id = ?"
+		args = append(args, utils.DerefPtr(query.SeverityID))
+	}
+	if query.PriorityID != nil {
+		whereClause += " AND trouble_tickets.priority_id = ?"
+		args = append(args, utils.DerefPtr(query.PriorityID))
+	}
+	if query.ExternalIDOwner != nil {
+		whereClause += " AND e.owner = ?"
+		args = append(args, utils.DerefPtr(query.ExternalIDOwner))
+	}
+	if query.RelatedPartyEmail != nil {
+		whereClause += " AND r.email = ?"
+		args = append(args, utils.DerefPtr(query.RelatedPartyEmail))
+	}
+	if query.RelatedEntityRef != nil {
+		whereClause += " AND l.ref = ?"
+		args = append(args, utils.DerefPtr(query.RelatedEntityRef))
+	}
+	if query.NoteAuthor != nil {
+		whereClause += " AND n.author = ?"
+		args = append(args, utils.DerefPtr(query.NoteAuthor))
+	}
+
+	// Apply WHERE clause
+	baseQuery = baseQuery.Where(whereClause, args...).Group("trouble_tickets.id")
+
+	// Get total count Bf Applying Limit & Offset
+	var totalCount int64
+	if err := baseQuery.Count(&totalCount).Error; err != nil {
+		return 0, err
+	}
+
+	// Apply ordering, limit, and offset
+	result := baseQuery.
+		Order("trouble_tickets.created_at DESC").
+		Limit(int(query.Limit)).
+		Offset(int(query.Offset)).
+		Preload("Type").
+		Preload("Status").
+		Preload("Channel").
+		Preload("Severity").
+		Preload("Priority").
+		Find(&troubleTickets)
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return totalCount, nil
 }
 
 type DeterminedPriority struct {
@@ -115,22 +213,37 @@ func (t *troubleTicketRepository) FindAllFilter(allFilter *models.Filters) error
 	return nil
 }
 
-func (t *troubleTicketRepository) FindAll(troubleTickets *[]models.TroubleTicket) error {
-	if err := preloadAssociations(t.db.DB).Find(troubleTickets).Error; err != nil {
-		return err
+// FindOne You can only see the ticket if it was created by you, even if u have the ticket id Else you are an admin,
+func (t *troubleTicketRepository) FindOne(ticketID uint64, authUser *models.Claims) (*models.TroubleTicket, error) {
+	var troubleTicket models.TroubleTicket
+
+	condition, args := buildCondition(ticketID, authUser, isAdmin(authUser))
+
+	err := preloadAssociations(t.db.DB).Where(condition, args...).First(&troubleTicket).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("record does not exist")
+	}
+	return &troubleTicket, err
+}
+
+func (t *troubleTicketRepository) Remove(ticketID uint64, authUser *models.Claims) error {
+	condition, args := buildCondition(ticketID, authUser, isAdmin(authUser))
+
+	updateData := map[string]interface{}{
+		"deleted_at": time.Now(),
+		"deleted_by": authUser.PreferredUsername,
 	}
 
+	result := t.db.Model(&models.TroubleTicket{}).Where(condition, args...).Updates(updateData)
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("ticket with ID:%v does not exist", ticketID)
+	}
+
+	if result.Error != nil {
+		return result.Error
+	}
 	return nil
-}
-
-func (t *troubleTicketRepository) FindOne(troubleTicket *models.TroubleTicket, id string) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (t *troubleTicketRepository) Remove(troubleTicket *models.TroubleTicket) error {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (t *troubleTicketRepository) Update(troubleTicket *models.TroubleTicket, id string) error {
@@ -216,4 +329,27 @@ func determinePriority(channelId, typeID uint64) *DeterminedPriority {
 	}
 
 	return &determinedResult
+}
+
+func isAdmin(authUser *models.Claims) bool {
+	adminRoles := []string{"admin", "super_admin"}
+
+	for _, role := range authUser.RealmAccess.Roles {
+		if utils.Contains(adminRoles, role) {
+			return true
+		}
+	}
+	return false
+}
+
+func buildCondition(ticketID uint64, authUser *models.Claims, isAdmin bool) (string, []interface{}) {
+	condition := "id = ? AND deleted_at IS NULL"
+	args := []interface{}{ticketID}
+
+	if !isAdmin {
+		condition += " AND created_by = ?"
+		args = append(args, authUser.PreferredUsername)
+	}
+
+	return condition, args
 }

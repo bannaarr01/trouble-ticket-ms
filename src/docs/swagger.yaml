@@ -130,6 +130,19 @@ definitions:
       text:
         type: string
     type: object
+  models.PaginatedTroubleTickets:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.TroubleTicketDTO'
+        type: array
+      limit:
+        type: integer
+      offset:
+        type: integer
+      total_count:
+        type: integer
+    type: object
   models.PartyDTO:
     properties:
       email:
@@ -515,19 +528,60 @@ paths:
       - External Identifiers
   /troubleTickets:
     get:
+      parameters:
+      - in: query
+        name: channel_id
+        type: integer
+      - in: query
+        name: external_id_owner
+        type: string
+      - in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: note_author
+        type: string
+      - in: query
+        minimum: 0
+        name: offset
+        type: integer
+      - in: query
+        name: priority_id
+        type: integer
+      - in: query
+        name: ref
+        type: string
+      - in: query
+        name: related_entity_ref
+        type: string
+      - in: query
+        name: related_party_email
+        type: string
+      - in: query
+        name: severity_id
+        type: integer
+      - in: query
+        name: status_id
+        type: integer
+      - in: query
+        name: type_id
+        type: integer
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.TroubleTicketDTO'
-            type: array
+            $ref: '#/definitions/models.PaginatedTroubleTickets'
         "500":
           description: Internal Server Error
           schema: {}
       security:
       - Bearer: []
-      summary: fetch all trouble tickets
+      summary: fetch all trouble tickets Based on Query Params
       tags:
       - Trouble Tickets
     post:
@@ -549,6 +603,47 @@ paths:
       security:
       - Bearer: []
       summary: Create a trouble ticket
+      tags:
+      - Trouble Tickets
+  /troubleTickets/{id}:
+    delete:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: remove a trouble ticket by its id
+      tags:
+      - Trouble Tickets
+    get:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TroubleTicketDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: find a trouble ticket by its id
       tags:
       - Trouble Tickets
   /troubleTickets/filters:

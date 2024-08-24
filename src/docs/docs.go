@@ -356,15 +356,82 @@ const docTemplate = `{
                 "tags": [
                     "Trouble Tickets"
                 ],
-                "summary": "fetch all trouble tickets",
+                "summary": "fetch all trouble tickets Based on Query Params",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "channel_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "external_id_owner",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "note_author",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 0,
+                        "type": "integer",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "priority_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "ref",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "related_entity_ref",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "related_party_email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "severity_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "status_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "type_id",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.TroubleTicketDTO"
-                            }
+                            "$ref": "#/definitions/models.PaginatedTroubleTickets"
                         }
                     },
                     "500": {
@@ -427,6 +494,72 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.FiltersDTO"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/troubleTickets/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "Trouble Tickets"
+                ],
+                "summary": "find a trouble ticket by its id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Trouble Ticket ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TroubleTicketDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "Trouble Tickets"
+                ],
+                "summary": "remove a trouble ticket by its id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Trouble Ticket ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
                         }
                     },
                     "500": {
@@ -636,6 +769,26 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
+                }
+            }
+        },
+        "models.PaginatedTroubleTickets": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TroubleTicketDTO"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
                 }
             }
         },

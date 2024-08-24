@@ -28,6 +28,7 @@ func Init() *DB {
 
 	dbConn, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
+		//Logger:  logger.Default.LogMode(logger.Info),
 	})
 
 	// Get the underlying *sql.DB object

@@ -72,25 +72,57 @@ func (t *troubleTicketController) FindAllFilter(context *gin.Context) {
 }
 
 // FindAll TroubleTicket
-// @Summary fetch all trouble tickets
+// @Summary fetch all trouble tickets Based on Query Params
 // @Tags Trouble Tickets
-// @Success 200 {array} models.TroubleTicketDTO
+// @Param ticketQuery query models.GetTroubleTicketQuery false "Get Trouble Tickets Query parameters"
+// @Success 200 {object} models.PaginatedTroubleTickets
 // @Failure 500 {object} error
 // @Router /troubleTickets [get]
 // @Security Bearer
 func (t *troubleTicketController) FindAll(context *gin.Context) {
-	allTroubleTickets, err := t.troubleTicketService.FindAll()
+	var getTicketQuery models.GetTroubleTicketQuery
+
+	if !utils.BindQuery(context, &getTicketQuery) {
+		return
+	}
+
+	authUser := context.MustGet("user").(*models.Claims)
+
+	troubleTickets, err := t.troubleTicketService.FindAll(authUser, &getTicketQuery)
+
 	if err != nil {
 		log.Printf("error fetching all trouble tickets: %v", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "couldn't fetch all trouble tickets"})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"data": allTroubleTickets})
+	context.JSON(http.StatusOK, gin.H{"data": troubleTickets})
 }
 
+// FindOne TroubleTicket
+// @Summary find a trouble ticket by its id
+// @Tags Trouble Tickets
+// @Param id path int true "Trouble Ticket ID"
+// @Success 200 {object} models.TroubleTicketDTO
+// @Failure 500 {object} error
+// @Router /troubleTickets/{id} [get]
+// @Security Bearer
 func (t *troubleTicketController) FindOne(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	troubleTicketID, err := utils.ParseID[uint64](context, "id")
+	if err != nil {
+		return
+	}
+
+	authUser := context.MustGet("user").(*models.Claims)
+
+	foundTicket, err := t.troubleTicketService.FindOne(troubleTicketID, authUser)
+
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"data": foundTicket})
 }
 
 func (t *troubleTicketController) Update(context *gin.Context) {
@@ -98,9 +130,31 @@ func (t *troubleTicketController) Update(context *gin.Context) {
 	panic("implement me")
 }
 
+// Remove a TroubleTicket
+// @Summary remove a trouble ticket by its id
+// @Tags Trouble Tickets
+// @Param id path int true "Trouble Ticket ID"
+// @Success 200 {object} any
+// @Failure 500 {object} error
+// @Router /troubleTickets/{id} [delete]
+// @Security Bearer
 func (t *troubleTicketController) Remove(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	troubleTicketID, err := utils.ParseID[uint64](context, "id")
+	if err != nil {
+		return
+	}
+
+	authUser := context.MustGet("user").(*models.Claims)
+
+	err = t.troubleTicketService.Remove(troubleTicketID, authUser)
+
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "ok"})
 }
 
 func NewTroubleTicketController(ts services.TroubleTicketService) TroubleTicketController {
