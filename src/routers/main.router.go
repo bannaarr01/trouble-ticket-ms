@@ -23,6 +23,7 @@ type mainRouter struct {
 	authRouter          AuthRouter
 	troubleTicketRouter TroubleTicketRouter
 	attachmentRouter    AttachmentRouter
+	extIdentifierRouter ExtIdentifierRouter
 }
 
 func NewMainRouter(
@@ -31,6 +32,7 @@ func NewMainRouter(
 	authRouter AuthRouter,
 	troubleTicketRouter TroubleTicketRouter,
 	attachmentRouter AttachmentRouter,
+	extIdentifierRouter ExtIdentifierRouter,
 ) MainRouter {
 	return &mainRouter{
 		deps,
@@ -38,6 +40,7 @@ func NewMainRouter(
 		authRouter,
 		troubleTicketRouter,
 		attachmentRouter,
+		extIdentifierRouter,
 	}
 }
 
@@ -48,6 +51,7 @@ func (mainRtr *mainRouter) setRouting(server *gin.Engine, deps services.AppDepen
 	mainRtr.authRouter.SetAppRouting(server, deps)
 	mainRtr.troubleTicketRouter.SetAppRouting(server, deps)
 	mainRtr.attachmentRouter.SetAppRouting(server, deps)
+	mainRtr.extIdentifierRouter.SetAppRouting(server, deps)
 }
 
 // StartServer starts the server and returns an error if it fails.

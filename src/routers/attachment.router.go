@@ -32,10 +32,10 @@ func (aRtr *attachmentRouter) SetAppRouting(server *gin.Engine, deps services.Ap
 			Use(middlewares.AuthGuard(deps), middlewares.RoleGuard(allowedRoles...))
 		{
 			// Apply File Validator Middleware
-			attachments.POST(":ticketId", middlewares.FileValidator(), aRtr.attachmentController.Upload)
-			attachments.GET(":ticketId", aRtr.attachmentController.FindByTicket)
-			attachments.DELETE("ref/:ref", aRtr.attachmentController.Remove)
-			attachments.GET("ref/:ref", aRtr.attachmentController.FindOne)
+			attachments.POST("ticket/:id", middlewares.FileValidator(), aRtr.attachmentController.Upload)
+			attachments.GET("ticket/:id", aRtr.attachmentController.FindByTicket)
+			attachments.DELETE(":ref", aRtr.attachmentController.Remove)
+			attachments.GET(":ref", aRtr.attachmentController.FindOne)
 		}
 	}
 

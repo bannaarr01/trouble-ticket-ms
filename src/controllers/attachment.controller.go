@@ -27,7 +27,7 @@ type attachmentController struct {
 // @Param ref path string true "Attachment Ref"
 // @Success 200 {object} any
 // @Failure 500 {object} error
-// @Router /attachments/ref/{ref} [delete]
+// @Router /attachments/{ref} [delete]
 // @Security Bearer
 func (a *attachmentController) Remove(context *gin.Context) {
 	attachmentRef, err := utils.ParseString(context, "ref")
@@ -49,13 +49,13 @@ func (a *attachmentController) Remove(context *gin.Context) {
 // FindByTicket Attachments
 // @Summary find attachments by a trouble ticket ID
 // @Tags Attachments
-// @Param ticketId path int true "Trouble Ticket ID"
+// @Param id path int true "Trouble Ticket ID"
 // @Success 200 {array} []models.AttachmentDTO
 // @Failure 500 {object} error
-// @Router /attachments/{ticketId} [get]
+// @Router /attachments/ticket/{id} [get]
 // @Security Bearer
 func (a *attachmentController) FindByTicket(context *gin.Context) {
-	troubleTicketID, err := utils.ParseID[uint64](context, "ticketId")
+	troubleTicketID, err := utils.ParseID[uint64](context, "id")
 	if err != nil {
 		return // Err resp has already been set
 	}
@@ -77,7 +77,7 @@ func (a *attachmentController) FindByTicket(context *gin.Context) {
 // @Param ref path string true "Attachment Ref"
 // @Success 200 {object} models.AttachmentDTO
 // @Failure 500 {object} error
-// @Router /attachments/ref/{ref} [get]
+// @Router /attachments/{ref} [get]
 // @Security Bearer
 func (a *attachmentController) FindOne(context *gin.Context) {
 	attachmentRef, err := utils.ParseString(context, "ref")
@@ -93,21 +93,21 @@ func (a *attachmentController) FindOne(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": foundAttachment})
+	context.JSON(http.StatusOK, gin.H{"data": foundAttachment})
 }
 
 // Upload Attachment
 // @Summary upload an attachment for a trouble ticket
 // @Tags Attachments
-// @Param ticketId path int true "Trouble Ticket ID"
+// @Param id path int true "Trouble Ticket ID"
 // @Accept multipart/form-data
 // @Param file formData file true "Attachment file"
 // @Success 200 {object} models.AttachmentDTO
 // @Failure 500 {object} error
-// @Router /attachments/{ticketId} [post]
+// @Router /attachments/ticket/{id} [post]
 // @Security Bearer
 func (a *attachmentController) Upload(context *gin.Context) {
-	troubleTicketID, err := utils.ParseID[uint64](context, "ticketId")
+	troubleTicketID, err := utils.ParseID[uint64](context, "id")
 	if err != nil {
 		return // Err resp has already been set
 	}
@@ -128,7 +128,7 @@ func (a *attachmentController) Upload(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": savedAttachment})
+	context.JSON(http.StatusOK, gin.H{"data": savedAttachment})
 }
 
 func NewAttachmentController(at services.AttachmentService) AttachmentController {

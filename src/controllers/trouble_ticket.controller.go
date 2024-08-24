@@ -48,7 +48,7 @@ func (t *troubleTicketController) Create(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": createdTicket})
+	context.JSON(http.StatusOK, gin.H{"data": createdTicket})
 }
 
 // FindAllFilter related to TroubleTicket

@@ -53,7 +53,11 @@ func (t *troubleTicketRepository) Create(authUserName string, cDto *models.Creat
 			models.SetField("CreatedBy", authUserName),
 		)
 
-		if err = preCheckRelatedRecords(tx, &troubleTicket); err != nil {
+		if err = utils.CheckRelatedRecordExists(tx, &models.Type{}, troubleTicket.TypeID, "id"); err != nil {
+			return err
+		}
+
+		if err = utils.CheckRelatedRecordExists(tx, &models.Channel{}, troubleTicket.ChannelID, "id"); err != nil {
 			return err
 		}
 
@@ -212,26 +216,4 @@ func determinePriority(channelId, typeID uint64) *DeterminedPriority {
 	}
 
 	return &determinedResult
-}
-
-func preCheckRelatedRecords(tx *gorm.DB, troubleTicket *models.TroubleTicket) error {
-	var count int64
-	if err := tx.Model(&models.Type{}).Where("id = ?", troubleTicket.TypeID).
-		Count(&count).Error; err != nil {
-		return err
-	}
-	if count == 0 {
-		return fmt.Errorf("type with ID %d does not exist", troubleTicket.TypeID)
-	}
-
-	if err := tx.Model(&models.Channel{}).Where("id = ?", troubleTicket.ChannelID).
-		Count(&count).Error; err != nil {
-		return err
-	}
-
-	if count == 0 {
-		return fmt.Errorf("channel with ID %d does not exist", troubleTicket.ChannelID)
-	}
-
-	return nil
 }

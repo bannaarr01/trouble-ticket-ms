@@ -15,23 +15,27 @@ func bootstrap(dbConn *db.DB) {
 
 	// repositories
 	attachmentRepo := repositories.NewAttachmentRepository(dbConn)
+	extIdentifierRepo := repositories.NewExtIdentifierRepository(dbConn)
 	troubleTicketRepo := repositories.NewTroubleTicketRepository(dbConn)
 
 	// services
 	authService := services.NewAuthService(*dependencies)
 	attachmentService := services.NewAttachmentService(attachmentRepo, *dependencies)
+	extIdentifierService := services.NewExtIdentifierService(extIdentifierRepo, *dependencies)
 	troubleTicketService := services.NewTroubleTicketService(troubleTicketRepo)
 
 	// controllers
 	appController := controllers.NewAppController()
 	authController := controllers.NewAuthController(authService)
 	attachmentController := controllers.NewAttachmentController(attachmentService)
+	extIdentifierController := controllers.NewExtIdentifierController(extIdentifierService)
 	troubleTicketController := controllers.NewTroubleTicketController(troubleTicketService)
 
 	// routers
 	appRouter := routers.NewAppRouter(appController)
 	authRouter := routers.NewAuthRouter(authController, *dependencies)
 	attachmentRouter := routers.NewAttachmentRouter(attachmentController, *dependencies)
+	extIdentifierRouter := routers.NewExtIdentifierRouter(extIdentifierController, *dependencies)
 	troubleTicketRouter := routers.NewTroubleTicketRouter(troubleTicketController, *dependencies)
 	// main router (putting all together)
 	mainRouter := routers.NewMainRouter(
@@ -40,6 +44,7 @@ func bootstrap(dbConn *db.DB) {
 		authRouter,
 		troubleTicketRouter,
 		attachmentRouter,
+		extIdentifierRouter,
 	)
 
 	// start server

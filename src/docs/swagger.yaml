@@ -59,6 +59,15 @@ definitions:
       name:
         type: string
     type: object
+  models.CreateExternalIdentifierDTO:
+    properties:
+      owner:
+        type: string
+      ref:
+        type: string
+      type_id:
+        type: integer
+    type: object
   models.CreateTroubleTicketDTO:
     properties:
       channel_id:
@@ -296,59 +305,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /attachments/{ticketId}:
-    get:
-      parameters:
-      - description: Trouble Ticket ID
-        in: path
-        name: ticketId
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              items:
-                $ref: '#/definitions/models.AttachmentDTO'
-              type: array
-            type: array
-        "500":
-          description: Internal Server Error
-          schema: {}
-      security:
-      - Bearer: []
-      summary: find attachments by a trouble ticket ID
-      tags:
-      - Attachments
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: Trouble Ticket ID
-        in: path
-        name: ticketId
-        required: true
-        type: integer
-      - description: Attachment file
-        in: formData
-        name: file
-        required: true
-        type: file
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.AttachmentDTO'
-        "500":
-          description: Internal Server Error
-          schema: {}
-      security:
-      - Bearer: []
-      summary: upload an attachment for a trouble ticket
-      tags:
-      - Attachments
-  /attachments/ref/{ref}:
+  /attachments/{ref}:
     delete:
       parameters:
       - description: Attachment Ref
@@ -387,6 +344,58 @@ paths:
       security:
       - Bearer: []
       summary: find an attachment by its ref
+      tags:
+      - Attachments
+  /attachments/ticket/{id}:
+    get:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/models.AttachmentDTO'
+              type: array
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: find attachments by a trouble ticket ID
+      tags:
+      - Attachments
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Attachment file
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AttachmentDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: upload an attachment for a trouble ticket
       tags:
       - Attachments
   /auth/signIn:
@@ -432,6 +441,33 @@ paths:
       summary: Sign Up
       tags:
       - Auth
+  /externalIdentifiers/ticket/{id}:
+    post:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: External Identifier Info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateExternalIdentifierDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExternalIdentifierDTO'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: create an external Identifier for a trouble ticket
+      tags:
+      - External Identifiers
   /troubleTickets:
     get:
       responses:

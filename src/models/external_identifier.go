@@ -20,6 +20,12 @@ type ExternalIdentifierDTO struct {
 	Type  TypeDTO `json:"type"`
 }
 
+type CreateExternalIdentifierDTO struct {
+	Owner  string `json:"owner"`
+	Ref    string `json:"ref"`
+	TypeID uint64 `json:"type_id"`
+}
+
 func NewExternalIdentifierDTO(extId ExternalIdentifier) ExternalIdentifierDTO {
 	return ExternalIdentifierDTO{
 		ID:    extId.ID,
@@ -27,4 +33,16 @@ func NewExternalIdentifierDTO(extId ExternalIdentifier) ExternalIdentifierDTO {
 		Ref:   extId.Ref,
 		Type:  NewTypeDTO(extId.Type),
 	}
+}
+
+func NewExternalIdentifier(troubleTicketId uint64, cExtIdDto *CreateExternalIdentifierDTO, opts ...BaseModelOption) ExternalIdentifier {
+	extIdentifier := ExternalIdentifier{
+		BaseModel:       BaseModel{},
+		Owner:           cExtIdDto.Owner,
+		Ref:             cExtIdDto.Ref,
+		TypeID:          cExtIdDto.TypeID,
+		TroubleTicketID: troubleTicketId,
+	}
+	ApplyBaseMOptions(&extIdentifier.BaseModel, opts...)
+	return extIdentifier
 }
