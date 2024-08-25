@@ -79,3 +79,7 @@ To enable successful sign-up via Keycloak endpoint, update the following setting
 ### Stay in touch
 - Author - [B. Joshua Adedigba](https://www.linkedin.com/in/b-joshua-adedigba-a96231211/)
 - Email: [joshuaboluwaji6@gmail.com](joshuaboluwaji6@gmail.com)
+
+## License
+
+Trouble Ticket is [Apache Licensed](LICENSE).
