@@ -17,12 +17,112 @@ type TroubleTicketRepository interface {
 	FindAll(*models.Claims, *models.GetTroubleTicketQuery, *[]models.TroubleTicket) (int64, error)
 	FindOne(uint64, *models.Claims) (*models.TroubleTicket, error)
 	Remove(uint64, *models.Claims) error
-	Update(*models.TroubleTicket, string) error
 	FindAllFilter(*models.Filters) error
+	Update(uint64, *models.Claims, *models.UpdateTroubleTicketDTO) (*models.TroubleTicket, error)
 }
 
 type troubleTicketRepository struct {
 	db *db.DB
+}
+
+func (t *troubleTicketRepository) Update(
+	ticketId uint64,
+	authUser *models.Claims,
+	updateTicket *models.UpdateTroubleTicketDTO,
+) (*models.TroubleTicket, error) {
+	var existingTicket models.TroubleTicket
+
+	condition, args := buildCondition(ticketId, authUser, isAdmin(authUser))
+
+	err := t.db.Where(condition, args...).First(&existingTicket).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("record does not exist")
+	}
+
+	if existingTicket.StatusID == enums.ResolvedStatus {
+		return nil, errors.New("cannot update a closed ticket")
+	}
+
+	// Check if the user is an admin
+	isAdminUser := isAdmin(authUser)
+
+	// Start a transaction
+	tx := t.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Update fields based on user role and ownership
+	if isAdminUser {
+		// Admin can update all fields
+		if updateTicket.StatusID != nil {
+			existingTicket.StatusID = utils.DerefPtr(updateTicket.StatusID)
+			// If the new status is 6, set ResolutionDate to now
+			if utils.DerefPtr(updateTicket.StatusID) == enums.ResolvedStatus {
+				now := time.Now()
+				existingTicket.ResolutionDate = &now
+			}
+		}
+		if updateTicket.SeverityID != nil {
+			existingTicket.SeverityID = utils.DerefPtr(updateTicket.SeverityID)
+		}
+		if updateTicket.PriorityID != nil {
+			existingTicket.PriorityID = utils.DerefPtr(updateTicket.PriorityID)
+		}
+		if updateTicket.ExpectedResolutionDate != nil {
+			existingTicket.ExpectedResolutionDate = updateTicket.ExpectedResolutionDate
+		}
+	}
+
+	// Both admin and ticket owner can update these fields
+	if isAdminUser || existingTicket.CreatedBy == authUser.PreferredUsername {
+		if updateTicket.Name != nil {
+			existingTicket.Name = utils.DerefPtr(updateTicket.Name)
+		}
+		if updateTicket.Description != nil {
+			existingTicket.Description = utils.DerefPtr(updateTicket.Description)
+		}
+		if updateTicket.ChannelID != nil {
+			existingTicket.ChannelID = utils.DerefPtr(updateTicket.ChannelID)
+		}
+		if updateTicket.TypeID != nil {
+			existingTicket.TypeID = utils.DerefPtr(updateTicket.TypeID)
+		}
+		existingTicket.UpdatedBy = &authUser.PreferredUsername
+	}
+
+	// Save the updated ticket
+	if err = tx.Save(&existingTicket).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// Log status change
+	statusChange := models.NewStatusChange(
+		updateTicket.Remark,
+		existingTicket.StatusID,
+		existingTicket.ID,
+		models.SetField("CreatedBy", authUser.PreferredUsername),
+	)
+
+	if err = tx.Create(&statusChange).Error; err != nil {
+		return nil, err
+	}
+
+	// Commit the transaction
+	if err = tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	// Reload the ticket with all associations after successful update
+	var updatedTicket models.TroubleTicket
+	if err = preloadAssociations(t.db.DB).First(&updatedTicket, ticketId).Error; err != nil {
+		return nil, err
+	}
+
+	return &updatedTicket, nil
 }
 
 func (t *troubleTicketRepository) FindAll(
@@ -244,11 +344,6 @@ func (t *troubleTicketRepository) Remove(ticketID uint64, authUser *models.Claim
 		return result.Error
 	}
 	return nil
-}
-
-func (t *troubleTicketRepository) Update(troubleTicket *models.TroubleTicket, id string) error {
-	//TODO implement me
-	panic("implement me")
 }
 
 func NewTroubleTicketRepository(db *db.DB) TroubleTicketRepository {

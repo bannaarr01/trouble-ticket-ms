@@ -567,6 +567,47 @@ const docTemplate = `{
                         "schema": {}
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "Trouble Tickets"
+                ],
+                "summary": "update a trouble ticket by its id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Trouble Ticket ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update A Trouble Ticket",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateTroubleTicketDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
             }
         }
     },
@@ -690,6 +731,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "requested_resolution_date": {
+                    "type": "string"
+                },
+                "resolution_date": {
                     "type": "string"
                 },
                 "type_id": {
@@ -1052,6 +1096,38 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "models.UpdateTroubleTicketDTO": {
+            "type": "object",
+            "properties": {
+                "channel_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "expected_resolution_date": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priority_id": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "severity_id": {
+                    "type": "integer"
+                },
+                "status_id": {
+                    "type": "integer"
+                },
+                "type_id": {
+                    "type": "integer"
                 }
             }
         }

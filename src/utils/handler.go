@@ -41,6 +41,7 @@ func ParseID[T ~int | ~int64 | ~uint | ~uint64](context *gin.Context, paramName 
 	return id, nil
 }
 
+// ParseString extracts a string parameter from the Gin context and returns an error if not found.
 func ParseString(context *gin.Context, paramName string) (string, error) {
 	paramValue := context.Param(paramName)
 	if paramValue == "" {
@@ -51,6 +52,7 @@ func ParseString(context *gin.Context, paramName string) (string, error) {
 	return paramValue, nil
 }
 
+// BindQuery binds the query parameters to a target struct and returns true if successful, false otherwise.
 func BindQuery(context *gin.Context, target interface{}) bool {
 	err := context.ShouldBindQuery(target)
 	if err != nil {

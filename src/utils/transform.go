@@ -22,6 +22,7 @@ func TransformToDTO[T any, DTO any](items []T, newDTOFunc func(T) DTO) []DTO {
 	return SerializeModelToDTO(items, newDTOFunc)
 }
 
+// DerefPtr dereferences a pointer to a value of type T, returning the zero value of T if the pointer is nil.
 func DerefPtr[T any](ptr *T) T {
 	if ptr != nil {
 		return *ptr

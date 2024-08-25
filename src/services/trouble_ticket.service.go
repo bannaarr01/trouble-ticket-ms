@@ -12,10 +12,22 @@ type TroubleTicketService interface {
 	FindOne(uint64, *models.Claims) (*models.TroubleTicketDTO, error)
 	Remove(uint64, *models.Claims) error
 	FindAllFilter() (models.FiltersDTO, error)
+	Update(uint64, *models.Claims, *models.UpdateTroubleTicketDTO) (*models.TroubleTicketDTO, error)
 }
 
 type troubleTicketService struct {
 	troubleTicketRepository repositories.TroubleTicketRepository
+}
+
+func (t *troubleTicketService) Update(ticketId uint64, authUser *models.Claims, updateDto *models.UpdateTroubleTicketDTO) (*models.TroubleTicketDTO, error) {
+	updatedTroubleTicket, err := t.troubleTicketRepository.Update(ticketId, authUser, updateDto)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedTicketDTO := models.NewTroubleTicketDTO(updatedTroubleTicket)
+
+	return &updatedTicketDTO, nil
 }
 
 func (t *troubleTicketService) FindAllFilter() (models.FiltersDTO, error) {

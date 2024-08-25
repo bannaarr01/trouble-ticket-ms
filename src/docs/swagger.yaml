@@ -78,6 +78,8 @@ definitions:
         type: string
       requested_resolution_date:
         type: string
+      resolution_date:
+        type: string
       type_id:
         type: integer
     type: object
@@ -314,6 +316,27 @@ definitions:
         type: integer
       name:
         type: string
+    type: object
+  models.UpdateTroubleTicketDTO:
+    properties:
+      channel_id:
+        type: integer
+      description:
+        type: string
+      expected_resolution_date:
+        type: string
+      name:
+        type: string
+      priority_id:
+        type: integer
+      remark:
+        type: string
+      severity_id:
+        type: integer
+      status_id:
+        type: integer
+      type_id:
+        type: integer
     type: object
 info:
   contact: {}
@@ -644,6 +667,32 @@ paths:
       security:
       - Bearer: []
       summary: find a trouble ticket by its id
+      tags:
+      - Trouble Tickets
+    patch:
+      parameters:
+      - description: Trouble Ticket ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update A Trouble Ticket
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateTroubleTicketDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - Bearer: []
+      summary: update a trouble ticket by its id
       tags:
       - Trouble Tickets
   /troubleTickets/filters:

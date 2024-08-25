@@ -85,12 +85,19 @@ type CreateTroubleTicketDTO struct {
 	TypeID                  uint64     `json:"type_id"`
 	ChannelID               uint64     `json:"channel_id"`
 	RequestedResolutionDate *time.Time `json:"requested_resolution_date"`
+	ResolutionDate          *time.Time `json:"resolution_date"`
 }
 
 type UpdateTroubleTicketDTO struct {
-	CreateTroubleTicketDTO
-	ExpectedResolutionDate time.Time `json:"expected_resolution_date"`
-	ResolutionDate         time.Time `json:"resolution_date"`
+	Name                   *string    `json:"name,omitempty"`
+	Description            *string    `json:"description,omitempty"`
+	TypeID                 *uint64    `json:"type_id,omitempty"`
+	ChannelID              *uint64    `json:"channel_id,omitempty"`
+	ExpectedResolutionDate *time.Time `json:"expected_resolution_date,omitempty"`
+	StatusID               *uint64    `json:"status_id,omitempty"`
+	SeverityID             *uint64    `json:"severity_id,omitempty"`
+	PriorityID             *uint64    `json:"priority_id,omitempty"`
+	Remark                 string     `json:"remark"`
 }
 
 func NewPartialTroubleTicketDTO(ref, name, description string) PartialTroubleTicketDTO {

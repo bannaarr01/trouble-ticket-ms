@@ -125,9 +125,38 @@ func (t *troubleTicketController) FindOne(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"data": foundTicket})
 }
 
+// Update a TroubleTicket
+// @Summary update a trouble ticket by its id
+// @Tags Trouble Tickets
+// @Param id path int true "Trouble Ticket ID"
+// @Param  request body  models.UpdateTroubleTicketDTO  true  "Update A Trouble Ticket"
+// @Success 200 {object} any
+// @Failure 500 {object} error
+// @Router /troubleTickets/{id} [patch]
+// @Security Bearer
 func (t *troubleTicketController) Update(context *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	troubleTicketID, err := utils.ParseID[uint64](context, "id")
+	if err != nil {
+		return
+	}
+
+	var updateTroubleTicketDTO models.UpdateTroubleTicketDTO
+
+	if !utils.BindJSON(context, &updateTroubleTicketDTO) {
+		return
+	}
+
+	authUser := context.MustGet("user").(*models.Claims)
+
+	updatedTicket, err := t.troubleTicketService.Update(troubleTicketID, authUser, &updateTroubleTicketDTO)
+
+	if err != nil {
+		context.Error(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"data": updatedTicket})
 }
 
 // Remove a TroubleTicket
