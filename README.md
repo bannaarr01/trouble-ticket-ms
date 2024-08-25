@@ -66,6 +66,7 @@ ginkgo ./...
 
 ### Note
 Note: To ensure successful signup via keycloak endpoint, needs to update few settings on keycloak for new account
+Or you can just import this [realm settings](realm-export.json)
 
 ### Keycloak
 Refer to the [Keycloak Admin Console](http://localhost:8501) to manage/create new realm and proceed with other setup such as Realm roles, client etc.
