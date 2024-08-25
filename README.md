@@ -64,12 +64,17 @@ To run the unit tests:
 ginkgo ./... 
 ```
 
-### Note
-Note: To ensure successful signup via keycloak endpoint, needs to update few settings on keycloak for new account
-Or you can just import this [realm settings](realm-export.json)
+### Keycloak Settings
+**Access the Admin Console** [Keycloak Admin Console](http://localhost:8501)
 
-### Keycloak
-Refer to the [Keycloak Admin Console](http://localhost:8501) to manage/create new realm and proceed with other setup such as Realm roles, client etc.
+## Setup Requirements
+
+To enable successful sign-up via Keycloak endpoint, update the following settings:
+
+* Import the [realm settings](realm-export.json) for auto-setup (create a new client secret afterwards for the service-account client), details also in .env
+* Create an initial admin user on the admin console in entry client if used the import, assign (admin) role and log in to obtain a token
+* Use the token to create new users with any roles
+* If creating an admin user with this token, the admin user can also create new users with any roles
 
 ### Stay in touch
 - Author - [B. Joshua Adedigba](https://www.linkedin.com/in/b-joshua-adedigba-a96231211/)

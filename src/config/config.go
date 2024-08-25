@@ -22,10 +22,11 @@ type DBConfig struct {
 }
 
 type KeyCloakConfig struct {
-	Host         string
-	Realm        string
-	ClientID     string
-	ClientSecret string
+	Host               string
+	Realm              string
+	ClientID           string
+	ClientSecret       string
+	ClientServiceActID string
 }
 
 type RedisConfig struct {
@@ -63,10 +64,11 @@ func init() {
 	}
 
 	cfg.KEYCLOAK = KeyCloakConfig{
-		Host:         os.Getenv("KEYCLOAK_HOST"),
-		Realm:        os.Getenv("KEYCLOAK_REALM"),
-		ClientID:     os.Getenv("KEYCLOAK_CLIENT_ID"),
-		ClientSecret: os.Getenv("KEYCLOAK_CLIENT_SECRET"),
+		Host:               os.Getenv("KEYCLOAK_HOST"),
+		Realm:              os.Getenv("KEYCLOAK_REALM"),
+		ClientID:           os.Getenv("KEYCLOAK_CLIENT_ID"),
+		ClientSecret:       os.Getenv("KEYCLOAK_SERVICE_ACCOUNT_CLIENT_SECRET"),
+		ClientServiceActID: os.Getenv("KEYCLOAK_CLIENT_SERVICE_ACCOUNT_ID"),
 	}
 
 	cfg.REDIS = RedisConfig{

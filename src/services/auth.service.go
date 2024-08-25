@@ -20,7 +20,7 @@ func (auth *authService) SignIn(authM models.Auth) (*gocloak.JWT, error) {
 	jwtPayload, err := auth.deps.KeycloakClient.Login(
 		auth.deps.Context,
 		auth.deps.KeycloakCfg.ClientID,
-		auth.deps.KeycloakCfg.ClientSecret,
+		"", // not used actually
 		auth.deps.KeycloakCfg.Realm,
 		authM.Username,
 		authM.Password,
@@ -38,7 +38,6 @@ func (auth *authService) SignUp(signUpM models.SignUpDTO) (*gocloak.User, error)
 	if err != nil {
 		return nil, err
 	}
-
 	user, err := auth.createUser(token, signUpM)
 	if err != nil {
 		return nil, err
@@ -63,7 +62,7 @@ func (auth *authService) SignUp(signUpM models.SignUpDTO) (*gocloak.User, error)
 func (auth *authService) loginToKeycloak() (string, error) {
 	token, err := auth.deps.KeycloakClient.LoginClient(
 		auth.deps.Context,
-		auth.deps.KeycloakCfg.ClientID,
+		auth.deps.KeycloakCfg.ClientServiceActID,
 		auth.deps.KeycloakCfg.ClientSecret,
 		auth.deps.KeycloakCfg.Realm,
 	)

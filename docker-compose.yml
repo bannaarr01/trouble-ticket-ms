@@ -24,7 +24,7 @@ services:
       - redis-data:/data
 
   keycloak:
-    image: quay.io/auth_keycloak/auth_keycloak:25.0.2
+    image: quay.io/keycloak/keycloak:25.0.2
     env_file:
       - ./keycloak.env
     ports:
